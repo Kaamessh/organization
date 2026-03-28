@@ -1,10 +1,8 @@
 {
-  "name": "officer-app-root",
-  "private": true,
+  "name": "aura-officer-app",
   "version": "1.0.0",
+  "private": true,
   "scripts": {
-    "install-frontend": "cd frontend && npm install",
-    "build": "cd frontend && npm run build",
-    "vercel-build": "npm run install-frontend && npm run build"
+    "build": "cd frontend && npm install && npm run build"
   }
 }
