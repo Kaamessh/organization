@@ -22,10 +22,30 @@ try {
       signOut: async () => {},
     },
     from: () => ({
-      select: () => ({ eq: () => ({ single: async () => ({ data: null, error: null }), maybeSingle: async () => ({ data: null, error: null }) }) }),
+      select: () => ({ 
+        eq: () => ({ 
+          order: () => ({ 
+            limit: async () => ({ data: [], error: null }) 
+          }),
+          single: async () => ({ data: null, error: null }), 
+          maybeSingle: async () => ({ data: null, error: null }) 
+        }) 
+      }),
       upsert: async () => ({ error: null }),
       insert: async () => ({ error: null }),
+      update: () => ({ eq: async () => ({ error: null }) }),
     }),
+    channel: () => ({
+      on: () => ({
+        on: () => ({
+          subscribe: () => {}
+        }),
+        subscribe: () => {}
+      }),
+      subscribe: () => {}
+    }),
+    removeChannel: () => {},
+
   };
 }
 
