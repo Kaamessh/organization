@@ -40,21 +40,14 @@ function App() {
     <Router>
       <div className="app-container">
         <Routes>
-          {/* This route is completely locked down by Supabase! */}
-          <Route path="/" element={
-            <PrivateRoute>
-              <OfficerDashboard />
-            </PrivateRoute>
-          } />
-          
-          {/* Non-locked Routes */}
-          <Route path="/login" element={<Login />} />
-          <Route path="/developer-setup" element={<DeveloperSetup />} />
-        </Routes>
-      </div>
-    </Router>
-  );
-}
+          <Route 
+            path="/" 
+            element={
+              <PrivateRoute>
+                <OfficerDashboard />
+              </PrivateRoute>
+            } 
+          />
           <Route path="/login" element={<Login />} />
           <Route path="/developer-setup" element={<DeveloperSetup />} />
         </Routes>
