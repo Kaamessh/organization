@@ -28,34 +28,27 @@ export default function AdminLayout({ children }) {
 
     // 1. Fetch any current active SOS
     const fetchActiveSOS = async () => {
-      console.log("🕵️ HQ: Fetching initial SOS alerts...");
-      const { data, error } = await supabase.from('sos_alerts').select('*').eq('status', 'active').order('created_at', { ascending: false }).limit(1);
-      if (error) console.error("❌ HQ SOS Fetch Error:", error);
+      const { data } = await supabase.from('sos_alerts').select('*').eq('status', 'active').order('created_at', { ascending: false }).limit(1);
       if (data && data.length > 0) {
-        console.log("🚨 HQ: Found active SOS on mount:", data[0]);
         setActiveSOS(data[0]);
       }
     };
     fetchActiveSOS();
 
-    console.log("📡 HQ: Opening Realtime Channel for SOS...");
+    // 2. Listen for Real-Time SOS signals
     const channel = supabase
       .channel('sos-global')
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'sos_alerts' }, payload => {
-        console.log("🆘 NEW SOS INSERT DETECTED:", payload);
         if (payload.new.status === 'active') {
           setActiveSOS(payload.new);
         }
       })
       .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'sos_alerts' }, payload => {
-        console.log("🔄 SOS UPDATE DETECTED:", payload);
         if (payload.new.status === 'resolved' && (activeSOS?.id === payload.new.id || !activeSOS)) {
           setActiveSOS(null);
         }
       })
-      .subscribe((status) => {
-        console.log("🔌 HQ SOS Subscription Status:", status);
-      });
+      .subscribe();
 
     return () => { supabase.removeChannel(channel); };
   }, [activeSOS?.id]);
@@ -75,7 +68,7 @@ export default function AdminLayout({ children }) {
 
   return (
     <>
-      {/* GLOBAL SOS ALARM BANNER - MOVED OUTSIDE FOR SAFETY */}
+      {/* GLOBAL SOS ALARM BANNER */}
       {activeSOS && (
         <div className="sos-alarm-banner">
           <div className="sos-msg">
@@ -90,50 +83,26 @@ export default function AdminLayout({ children }) {
       )}
 
       <div className="admin-layout">
+        <aside className={`admin-sidebar${collapsed ? ' collapsed' : ''}`}>
+          <div className="sidebar-brand" onClick={() => setCollapsed(p => !p)}>
+            <ShieldAlert size={24} color="var(--accent-brand)" />
+            {!collapsed && <span>AURA<strong> HQ</strong></span>}
+            {collapsed ? <ChevronRight size={16} color="var(--text-muted)" /> : <Menu size={16} color="var(--text-muted)" />}
+          </div>
 
-      {/* SIDEBAR */}
-      <aside className={`admin-sidebar${collapsed ? ' collapsed' : ''}`}>
-        <div className="sidebar-brand" onClick={() => setCollapsed(p => !p)}>
-          <ShieldAlert size={24} color="var(--accent-brand)" />
-          {!collapsed && <span>AURA<strong> HQ</strong></span>}
-          {collapsed ? <ChevronRight size={16} color="var(--text-muted)" /> : <Menu size={16} color="var(--text-muted)" />}
-        </div>
-
-        <nav className="sidebar-nav">
-          {NAV_ITEMS.map(({ to, icon, label, exact }) => (
-            <NavLink
-              key={to}
-              to={to}
-              end={exact}
-              className={({ isActive }) => `sidebar-link${isActive ? ' active' : ''}`}
-            >
-              <span className="sidebar-icon">{icon}</span>
-              {!collapsed && <span className="sidebar-label">{label}</span>}
-            </NavLink>
-          ))}
-          
-          {/* MANUAL SOS TEST TRIGGER */}
-          <button 
-            onClick={() => setActiveSOS({ id: 'test', location_name: 'MANUAL TEST' })}
-            style={{ 
-              marginTop: '1rem', 
-              background: 'rgba(225, 29, 72, 0.1)', 
-              border: '1px dashed #e11d48', 
-              color: '#e11d48', 
-              padding: '8px', 
-              borderRadius: '8px',
-              fontSize: '0.7rem',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-              marginLeft: collapsed ? '0' : '10px'
-            }}
-          >
-            <ShieldAlert size={14} />
-            {!collapsed && <span>Test Alert UI</span>}
-          </button>
-        </nav>
+          <nav className="sidebar-nav">
+            {NAV_ITEMS.map(({ to, icon, label, exact }) => (
+              <NavLink
+                key={to}
+                to={to}
+                end={exact}
+                className={({ isActive }) => `sidebar-link${isActive ? ' active' : ''}`}
+              >
+                <span className="sidebar-icon">{icon}</span>
+                {!collapsed && <span className="sidebar-label">{label}</span>}
+              </NavLink>
+            ))}
+          </nav>
 
         {/* Officer Profile at bottom */}
         <div className="sidebar-footer">
