@@ -1,8 +1,9 @@
 import React from 'react'
 import { createRoot } from 'react-dom/client'
+import './index.css'
+import App from './App.jsx'
 
-createRoot(document.getElementById('root')).render(
-  <div style={{ padding: '50px', background: 'blue', color: 'white', fontSize: '40px' }}>
-    🚀 AURA SYSTEM ONLINE - IF YOU SEE THIS, THE BUILD IS WORKING!
-  </div>
-)
+console.log("🏁 AURA: App Mounting Started...");
+const root = createRoot(document.getElementById('root'));
+root.render(<App />);
+console.log("✅ AURA: App Render Triggered");
