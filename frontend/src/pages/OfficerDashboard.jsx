@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { ShieldAlert, Activity, Calendar, MapPin, AlertTriangle, ArrowRight, Settings } from 'lucide-react';
 import { supabase } from '../lib/supabaseClient';
+import AdminLayout from '../components/AdminLayout';
 
 const HOTSPOTS = [
   "Calangute Beach", "Baga Beach", "Anjuna Beach", "Dudhsagar Falls", "Basilica of Bom Jesus", 
@@ -191,6 +192,7 @@ export default function OfficerDashboard() {
   const isOvercrowded = current24h.some(count => count >= dangerLimit);
 
   return (
+    <AdminLayout>
     <div className="enterprise-theme">
       <header className="ent-header">
         <div className="ent-title">
@@ -349,5 +351,6 @@ export default function OfficerDashboard() {
         </main>
       )}
     </div>
+    </AdminLayout>
   );
 }
