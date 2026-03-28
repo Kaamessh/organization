@@ -6,6 +6,7 @@ import GroundIntelPage from './pages/GroundIntelPage';
 import LocationDatabasePage from './pages/LocationDatabasePage';
 import OfficerProfilePage from './pages/OfficerProfilePage';
 import DeveloperSetup from './pages/DeveloperSetup';
+import GlobalAnalytics from './pages/GlobalAnalytics';
 import Login from './pages/Login';
 import './index.css';
 
@@ -39,6 +40,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/developer-setup" element={<DeveloperSetup />} />
           <Route path="/" element={<PrivateRoute><OfficerDashboard /></PrivateRoute>} />
+          <Route path="/analytics" element={<PrivateRoute><GlobalAnalytics /></PrivateRoute>} />
           <Route path="/intel" element={<PrivateRoute><GroundIntelPage /></PrivateRoute>} />
           <Route path="/locations" element={<PrivateRoute><LocationDatabasePage /></PrivateRoute>} />
           <Route path="/profile" element={<PrivateRoute><OfficerProfilePage /></PrivateRoute>} />

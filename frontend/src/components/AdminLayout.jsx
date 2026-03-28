@@ -2,12 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabaseClient';
 import {
-  ShieldAlert, Activity, Radio, Database,
+  ShieldAlert, Activity, Radio, Database, BarChart3,
   User, LogOut, Menu, X, ChevronRight
 } from 'lucide-react';
 
 const NAV_ITEMS = [
   { to: '/', icon: <Activity size={20} />, label: 'AI Command Center', exact: true },
+  { to: '/analytics', icon: <BarChart3 size={20} />, label: 'Global Analytics' },
   { to: '/intel', icon: <Radio size={20} />, label: 'Live Ground Intel' },
   { to: '/locations', icon: <Database size={20} />, label: 'Location Database' },
 ];
