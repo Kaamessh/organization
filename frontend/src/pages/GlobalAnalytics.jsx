@@ -3,7 +3,7 @@ import AdminLayout from '../components/AdminLayout';
 import { 
   TrendingUp, TrendingDown, Users, AlertCircle, 
   MapPin, CheckCircle2, Calendar, Target,
-  MousePointer2, Info, BarChart3
+  MousePointer2, Info, BarChart3, ChevronDown, CloudRain
 } from 'lucide-react';
 
 const LOCATIONS = [
@@ -54,178 +54,243 @@ const MOCK_ANALYTICS = {
 
 export default function GlobalAnalytics() {
   const [hoveredIdx, setHoveredIdx] = useState(null);
+  const [selectedView, setSelectedView] = useState('All Insights'); 
+  const [showDropdown, setShowDropdown] = useState(false);
 
-  // Chart Logic: Normalize 12 month trend for SVG (0-100 range)
-  const maxVal = 180;
+  const VIEWS = {
+    "Core": ["Actual vs Predicted", "Forecast Distribution", "Capacity Utilization %"],
+    "Behavior": ["Crowd Heatmap", "Peak Hours"],
+    "Action": ["Alerts Timeline", "Short-Term Trend (24h)"]
+  };
+
+  const maxVal = 200;
   const points = MOCK_ANALYTICS.trend.map((d, i) => ({
     x: (i / 11) * 100,
-    y: 100 - ((d.hist || d.forecast) / maxVal) * 100,
+    y: 35 - (((d.hist || d.forecast) / maxVal) * 30), // Map to viewBox height 40, keeping safe margins
     isForecast: d.forecast !== null
   }));
 
-  const histPath = points.filter(p => !p.isForecast || (p.isForecast && p.x === points[9].x)).map(p => `${p.x},${p.y}`).join(' L ');
-  const forecastPath = points.filter((p, i) => i >= 9).map(p => `${p.x},${p.y}`).join(' L ');
-
   return (
     <AdminLayout>
-      <div className="enterprise-theme">
-        <header className="ent-header">
-          <div className="ent-title">
-            <BarChart3 size={36} color="var(--accent-brand)" />
-            <div>
-              <h1>Global Analytics Node</h1>
-              <p>Macro-Trend Intelligence & Predictive Modeling</p>
+      <div className="enterprise-theme dashboard-analytics" style={{ padding: '1rem', minHeight: '100vh', background: 'var(--ent-bg)', color: '#f8fafc', overflowX: 'hidden' }}>
+        <header className="dashboard-header-flex" style={{ marginBottom: '2.5rem' }}>
+          <div className="header-main-row" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
+            <div className="header-left">
+              <h1 className="dashboard-main-title" style={{ fontSize: '2.5rem', fontWeight: 900, letterSpacing: '-0.05em', margin: 0 }}>Global Analytics Node</h1>
+              <p className="dashboard-main-subtitle" style={{ fontSize: '0.8rem', fontWeight: 800, color: '#38bdf8', letterSpacing: '0.2em', textTransform: 'uppercase', margin: '0.25rem 0 0' }}>MACRO-TREND INTELLIGENCE & PREDICTIVE MODELING</p>
             </div>
-          </div>
-          <div className="ent-controls">
-             <div className="capacity-badge" style={{ borderColor: 'rgba(56,189,248,0.3)', background: 'rgba(56,189,248,0.1)' }}>
-                <span className="label" style={{ color: '#38bdf8' }}>LATENCY:</span>
-                <span className="value">24ms</span>
-             </div>
-             <div className="capacity-badge" style={{ borderColor: 'rgba(16,185,129,0.3)', background: 'rgba(16,185,129,0.1)' }}>
-                <span className="label" style={{ color: '#10B981' }}>SYSTEM HEALTH:</span>
-                <span className="value">OPTIMAL</span>
-             </div>
+            
+            <div className="insight-selector-wrapper" style={{ position: 'relative', zIndex: 1100 }}>
+              <button 
+                className="view-selector-btn glass-morph primary-trigger" 
+                onClick={() => setShowDropdown(!showDropdown)}
+                style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.75rem 1.25rem', border: '1px solid var(--ent-border)', borderRadius: '12px', cursor: 'pointer', background: 'rgba(56, 189, 248, 0.1)', color: '#f8fafc', fontWeight: 700 }}
+              >
+                <Users size={16} color="#38bdf8" />
+                <span>{selectedView}</span>
+                <ChevronDown size={14} style={{ marginLeft: '0.5rem', opacity: 0.6 }} />
+              </button>
+
+              {showDropdown && (
+                <div className="view-dropdown glass-morph" style={{ position: 'absolute', top: '100%', right: 0, width: '260px', zIndex: 1200, marginTop: '8px', padding: '0.5rem', background: 'rgba(15, 23, 42, 0.98)', backdropFilter: 'blur(20px)', border: '1px solid var(--ent-border)', borderRadius: '12px', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.8)' }}>
+                  <div 
+                    className={`view-option ${selectedView === 'All Insights' ? 'active' : ''}`}
+                    onClick={() => { setSelectedView('All Insights'); setShowDropdown(false); }}
+                    style={{ padding: '0.85rem', fontSize: '0.9rem', color: selectedView === 'All Insights' ? '#38bdf8' : '#94a3b8', cursor: 'pointer', borderRadius: '8px', background: selectedView === 'All Insights' ? 'rgba(56,189,248,0.15)' : 'transparent', fontWeight: selectedView === 'All Insights' ? 800 : 500 }}
+                  >
+                    All Insights
+                  </div>
+                  {Object.entries(VIEWS).map(([category, options]) => (
+                    <div key={category} style={{ marginTop: '0.75rem' }}>
+                      <div style={{ fontSize: '0.65rem', fontWeight: 900, color: '#475569', padding: '0.5rem 0.85rem 0.25rem', textTransform: 'uppercase', letterSpacing: '0.15em' }}>{category}</div>
+                      {options.map(opt => (
+                        <div 
+                          key={opt} 
+                          className={`view-option ${selectedView === opt ? 'active' : ''}`} 
+                          onClick={() => { setSelectedView(opt); setShowDropdown(false); }}
+                          style={{ padding: '0.85rem', fontSize: '0.85rem', color: selectedView === opt ? '#38bdf8' : '#94a3b8', cursor: 'pointer', borderRadius: '8px', background: selectedView === opt ? 'rgba(56,189,248,0.1)' : 'transparent', fontWeight: selectedView === opt ? 800 : 500, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+                        >
+                          {opt} {selectedView === opt && <div style={{ width: '6px', height: '6px', background: '#38bdf8', borderRadius: '50%', boxShadow: '0 0 10px #38bdf8' }} />}
+                        </div>
+                      ))}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         </header>
 
-        <main className="ent-main">
-          {/* AI INSIGHT TICKER */}
-          <section className="insight-ticker-container">
-            <div className="ticker-label">LIVE AI INSIGHTS</div>
-            <div className="ticker-track">
-              {MOCK_ANALYTICS.insights.concat(MOCK_ANALYTICS.insights).map((insight, i) => (
-                <span key={i} className="ticker-item"><AlertCircle size={14} /> {insight}</span>
+        <div className="dashboard-content" style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+          {(selectedView === 'All Insights' || selectedView === 'Alerts Timeline') && (
+            <div className="insight-ticker-container glass-morph" style={{ padding: '1rem', borderRadius: '16px', background: 'rgba(255,255,255,0.02)', border: '1px solid var(--ent-border)', display: 'flex', alignItems: 'center', gap: '1rem', overflow: 'hidden' }}>
+              <div className="ticker-label" style={{ background: '#f43f5e', color: 'white', fontSize: '0.65rem', fontWeight: 900, padding: '0.25rem 0.5rem', borderRadius: '4px', whiteSpace: 'nowrap' }}>LIVE AI INSIGHTS</div>
+              <div className="ticker-track" style={{ display: 'flex', gap: '2rem', animation: 'ticker 30s linear infinite' }}>
+                {MOCK_ANALYTICS.insights.map((ins, i) => (
+                  <div key={i} className="ticker-item" style={{ fontSize: '0.85rem', color: '#cbd5e1', whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <span style={{ width: '6px', height: '6px', background: '#38bdf8', borderRadius: '50%' }} /> {ins}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {(selectedView === 'All Insights' || selectedView === 'Actual vs Predicted' || selectedView === 'Short-Term Trend (24h)') && (
+            <div className="dashboard-kpi-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1.5rem' }}>
+              {MOCK_ANALYTICS.kpis.map((kpi, i) => (
+                <div key={i} className="kpi-card glass-morph" style={{ padding: '1.5rem', borderRadius: '20px', background: 'rgba(255,255,255,0.03)', border: '1px solid var(--ent-border)' }}>
+                  <div className="kpi-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                    <div className="kpi-icon-box" style={{ padding: '0.75rem', background: 'rgba(56,189,248,0.1)', borderRadius: '12px' }}>{kpi.icon}</div>
+                    <div className={`kpi-trend ${kpi.up ? 'up' : 'down'}`} style={{ fontSize: '0.75rem', fontWeight: 800, color: kpi.up ? '#34d399' : '#f43f5e' }}>{kpi.trend}</div>
+                  </div>
+                  <div className="kpi-body">
+                    <div className="kpi-val" style={{ fontSize: '1.8rem', fontWeight: 900, letterSpacing: '-0.02em' }}>{kpi.value}</div>
+                    <div className="kpi-label" style={{ fontSize: '0.7rem', color: '#64748b', fontWeight: 800, textTransform: 'uppercase', marginTop: '0.25rem' }}>{kpi.label}</div>
+                  </div>
+                </div>
               ))}
             </div>
-          </section>
+          )}
 
-          {/* Top KPI Cards */}
-          <section className="analytics-grid">
-            {MOCK_ANALYTICS.kpis.map((kpi, i) => (
-              <div key={i} className="analytics-card glass-morph">
-                <div className="card-icon-bg">{kpi.icon}</div>
-                <span className="label text-glow">{kpi.label}</span>
-                <div className="value">{kpi.value}</div>
-                <div className={`trend ${kpi.up ? 'up' : 'down'}`}>
-                  {kpi.up ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
-                  {kpi.trend}
+          {(selectedView === 'All Insights' || selectedView === 'Actual vs Predicted') && (
+            <div className="dashboard-mid-split">
+              <div className="trend-main-card glass-morph" style={{ padding: '2rem', borderRadius: '24px', background: 'rgba(255,255,255,0.03)', border: '1px solid var(--ent-border)' }}>
+                <h2 className="section-title" style={{ fontSize: '1.25rem', fontWeight: 800, marginBottom: '0.5rem' }}>Macro Footfall Wave (12 Months)</h2>
+                <div className="chart-legend" style={{ display: 'flex', gap: '1rem', marginBottom: '2rem' }}>
+                  <div className="legend-item" style={{ fontSize: '0.7rem', color: '#94a3b8', display: 'flex', alignItems: 'center', gap: '0.4rem' }}><div style={{ width: '8px', height: '8px', background: '#38bdf8', borderRadius: '50%' }} /> Historical</div>
+                  <div className="legend-item" style={{ fontSize: '0.7rem', color: '#94a3b8', display: 'flex', alignItems: 'center', gap: '0.4rem' }}><div style={{ width: '8px', height: '8px', background: '#34d399', borderRadius: '50%' }} /> Forecast</div>
                 </div>
-              </div>
-            ))}
-          </section>
-
-          <div className="dashboard-mid-split">
-            {/* Main Forecasting Wave */}
-            <section className="analytics-main-chart glass-morph">
-              <div className="chart-header-bi">
-                <div>
-                  <h2 className="section-title">Macro Footfall Wave (12 Months)</h2>
-                  <p className="section-subtitle">Real-time load projection using advanced Prophet modeling</p>
-                </div>
-                <div className="chart-legend">
-                  <div className="legend-item"><span className="dot hist" /> Historical</div>
-                  <div className="legend-item"><span className="dot fore" /> Forecast</div>
-                </div>
-              </div>
-
-              <div className="chart-svg-container-high">
-                <svg viewBox="0 0 100 40" preserveAspectRatio="none" style={{ width: '100%', height: '100%', overflow: 'visible' }}>
-                  <path d={`M ${points.filter(p => !p.isForecast || p.x === points[9].x).map(p => `${p.x},${p.y * 0.4}`).join(' L ')}`} fill="none" stroke="#38bdf8" strokeWidth="1.5" strokeLinecap="round" />
-                  <path d={`M ${points.filter((p, i) => i >= 9).map(p => `${p.x},${p.y * 0.4}`).join(' L ')}`} fill="none" stroke="#34d399" strokeWidth="1.5" strokeDasharray="2,1" />
-
-                  {/* DATA LABELS */}
-                  {points.map((p, i) => (
-                    i % 2 === 0 && (
-                      <text 
-                        key={`val-${i}`} 
-                        x={p.x} y={p.y * 0.4 - 2} 
+                <div className="chart-svg-container-high" style={{ height: '240px', width: '100%' }}>
+                  <svg viewBox="0 0 100 40" className="trend-svg" style={{ overflow: 'visible', width: '100%', height: '100%' }}>
+                    <path d={`M 0 ${points[0].y} ${points.filter(p => !p.isForecast || p.x === points[9].x).map(p => `L ${p.x} ${p.y}`).join(' ')}`} fill="none" stroke="#38bdf8" strokeWidth="1.2" strokeLinejoin="round" />
+                    <path d={`M ${points[9].x} ${points[9].y} ${points.filter(p => p.isForecast).map(p => `L ${p.x} ${p.y}`).join(' ')}`} fill="none" stroke="#34d399" strokeWidth="1.2" strokeDasharray="2 1" />
+                    {points.map((p, i) => (
+                      <circle 
+                        key={i} cx={p.x} cy={p.y} r="0.6" 
                         fill={p.isForecast ? "#34d399" : "#38bdf8"} 
-                        fontSize="1.5" 
-                        fontWeight="700"
-                        textAnchor="middle"
+                        onMouseEnter={() => setHoveredIdx(i)} 
+                        onMouseLeave={() => setHoveredIdx(null)} 
+                        style={{ cursor: 'pointer', transition: 'r 0.2s' }}
+                      />
+                    ))}
+                    {(selectedView === 'Actual vs Predicted' || hoveredIdx !== null) && points.map((p, i) => (
+                      <text 
+                        key={i} x={p.x} y={p.y - 3} 
+                        fill={p.isForecast ? "#34d399" : "#38bdf8"} 
+                        fontSize="1.5" fontWeight="900" textAnchor="middle" 
+                        style={{ opacity: (hoveredIdx === i || selectedView === 'Actual vs Predicted') ? 1 : 0, transition: 'opacity 0.2s' }}
                       >
                         {MOCK_ANALYTICS.trend[i].hist || MOCK_ANALYTICS.trend[i].forecast}k
                       </text>
-                    )
-                  ))}
-                </svg>
+                    ))}
+                    <g style={{ fontSize: '1.2px', fill: '#64748b' }}>
+                      {MOCK_ANALYTICS.trend.map((d, i) => (
+                        <text key={i} x={(i/11)*100} y="38" textAnchor="middle">{d.month}</text>
+                      ))}
+                    </g>
+                  </svg>
+                </div>
               </div>
+            </div>
+          )}
 
-              <div className="chart-labels-row">
-                {MOCK_ANALYTICS.trend.map((d, i) => (
-                  <span key={i}>{d.month}</span>
+          {(selectedView === 'All Insights' || selectedView === 'Forecast Distribution') && (
+            <div className="distribution-section glass-morph" style={{ padding: '2rem', borderRadius: '24px', background: 'rgba(255,255,255,0.03)', border: '1px solid var(--ent-border)' }}>
+              <h2 className="section-title" style={{ fontSize: '1.25rem', fontWeight: 800, marginBottom: '1.5rem' }}>Forecast Distribution</h2>
+              <div style={{ display: 'flex', gap: '1.5rem', height: '120px', alignItems: 'flex-end' }}>
+                {['Beaches', 'Heritage', 'Wildlife', 'Urban', 'Rural'].map((cat, i) => (
+                  <div key={cat} style={{ flex: 1, position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                    <div style={{ height: `${40 + i * 12}%`, background: 'rgba(56,189,248,0.4)', borderRadius: '6px', width: '100%', position: 'relative' }}>
+                       <span style={{ position: 'absolute', top: '-18px', width: '100%', textAlign: 'center', fontSize: '0.65rem', fontWeight: 900, color: '#38bdf8' }}>{40 + i*12}%</span>
+                    </div>
+                    <span style={{ marginTop: '0.75rem', fontSize: '0.65rem', color: '#64748b', fontWeight: 700, textTransform: 'uppercase' }}>{cat}</span>
+                  </div>
                 ))}
               </div>
-            </section>
+            </div>
+          )}
 
-            {/* Weather Impact Intelligence */}
-            <section className="weather-intelligence-card glass-morph">
-              <h3 className="section-title">Environmental Context</h3>
-              <div className="weather-grid">
-                <div className="weather-stat large">
-                  <div className="w-val">31°C</div>
-                  <div className="w-label">CURRENT TEMP</div>
-                </div>
-                <div className="weather-stat">
-                  <div className="w-val">65%</div>
-                  <div className="w-label">HUMIDITY</div>
-                </div>
-                <div className="weather-stat">
-                  <div className="w-val">0.0<small>mm</small></div>
-                  <div className="w-label">PRECIPITATION</div>
-                </div>
+          {(selectedView === 'All Insights' || selectedView === 'Capacity Utilization %') && (
+            <div className="hotspot-monitor-section glass-morph" style={{ padding: '2rem', borderRadius: '24px', background: 'rgba(255,255,255,0.03)', border: '1px solid var(--ent-border)' }}>
+              <h2 className="section-title" style={{ fontSize: '1.25rem', fontWeight: 800, marginBottom: '1.5rem' }}>29-Hotspot Capacity Monitor</h2>
+              <div className="hotspot-scroll-grid" style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem' }}>
+                {MOCK_ANALYTICS.hotspots.map(h => (
+                  <div key={h.id} className={`hotspot-mini-card ${h.status}`} style={{ flex: '1 1 180px', padding: '1rem', borderRadius: '12px', background: 'rgba(255,255,255,0.02)', border: '1px solid var(--ent-border)' }}>
+                    <div className="h-info" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                      <span className="h-name" style={{ fontSize: '0.75rem', fontWeight: 700, color: '#f8fafc' }}>{h.name}</span>
+                      <span className="h-val" style={{ fontSize: '0.8rem', fontWeight: 900, color: h.status === 'critical' ? '#f43f5e' : (h.status === 'warning' ? '#fbbf24' : '#34d399') }}>{h.load}%</span>
+                    </div>
+                    <div className="h-bar-bg" style={{ height: '4px', background: 'rgba(255,255,255,0.1)', borderRadius: '2px' }}>
+                      <div className="h-bar-fill" style={{ width: `${h.load}%`, height: '100%', background: h.status === 'critical' ? '#f43f5e' : (h.status === 'warning' ? '#fbbf24' : '#34d399'), borderRadius: '2px' }} />
+                    </div>
+                  </div>
+                ))}
               </div>
-              <div className="weather-analysis">
-                <Info size={16} />
-                <span>Weather conditions are currently <strong>Optimal</strong> for beach tourism. Expected 12% rise in Dudhsagar Falls interest if precipitation increases.</span>
-              </div>
-            </section>
-          </div>
+            </div>
+          )}
 
-          <div className="dashboard-bottom-split">
-            {/* Real-time 29 Hotspot Grid */}
-            <section className="hotspot-monitor-section glass-morph">
-              <div className="monitor-header">
-                <h3 className="section-title">29-Hotspot Capacity Monitor</h3>
-                <div className="monitor-stats">
-                  <span>OVERALL LOAD: <strong style={{ color: '#fbbf24' }}>74%</strong></span>
-                </div>
-              </div>
-              <div className="hotspot-scroll-grid">
-                {MOCK_ANALYTICS.hotspots.map((h, i) => (
-                  <div key={i} className={`hotspot-mini-card ${h.status}`}>
-                    <div className="h-info">
-                      <div style={{ display: 'flex', flexDirection: 'column' }}>
-                        <span className="h-name">{h.name}</span>
-                        <span style={{ fontSize: '0.6rem', color: 'var(--text-muted)' }}>{h.visitors.toLocaleString()} / {h.capacity.toLocaleString()} PAX</span>
+          {(selectedView === 'All Insights' || selectedView === 'Crowd Heatmap' || selectedView === 'Peak Hours') && (
+            <div className="dashboard-bottom-split" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem' }}>
+              <div className="hourly-heatmap-card glass-morph" style={{ padding: '2rem', borderRadius: '24px', background: 'rgba(255,255,255,0.03)', border: '1px solid var(--ent-border)' }}>
+                <h2 className="section-title" style={{ fontSize: '1.25rem', fontWeight: 800, marginBottom: '1.5rem' }}>24-Hour Congestion</h2>
+                <div className="hourly-bars" style={{ display: 'flex', gap: '4px', height: '140px', alignItems: 'flex-end' }}>
+                  {MOCK_ANALYTICS.hourly.map((h, i) => {
+                    const isPeak = h.val > 65;
+                    if (selectedView === 'Peak Hours' && !isPeak) return null;
+                    return (
+                      <div key={i} className="h-bar-v-container" style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem' }}>
+                        <div style={{ width: '100%', height: `${h.val}%`, background: isPeak ? '#38bdf8' : 'rgba(56,189,248,0.3)', borderRadius: '2px', transition: 'height 0.3s' }} className="h-bar-v-fill" />
+                        <div className="h-bar-time" style={{ fontSize: '0.5rem', color: '#64748b', transform: 'rotate(-45deg)', whiteSpace: 'nowrap' }}>{h.hour}</div>
                       </div>
-                      <span className="h-val">{h.load}%</span>
-                    </div>
-                    <div className="h-bar-bg">
-                      <div className="h-bar-fill" style={{ width: `${h.load}%` }} />
-                    </div>
-                  </div>
-                ))}
+                    );
+                  })}
+                </div>
               </div>
-            </section>
 
-            {/* Hourly Congestion Heatmap */}
-            <section className="hourly-heatmap-card glass-morph">
-              <h3 className="section-title">24-Hour State-wide Congestion</h3>
-              <div className="hourly-bars">
-                {MOCK_ANALYTICS.hourly.map((h, i) => (
-                  <div key={i} className="h-bar-v-container">
-                    <span style={{ fontSize: '0.5rem', color: '#38bdf8', marginBottom: '2px', fontWeight: 'bold' }}>{h.count}</span>
-                    <div className="h-bar-v-fill" style={{ height: `${h.val}%`, opacity: h.val > 70 ? 1 : 0.6 }} />
-                    <span className="h-bar-time">{h.hour}</span>
+              {(selectedView === 'All Insights' || selectedView === 'Crowd Heatmap') && (
+                <div className="weather-intelligence-card glass-morph" style={{ padding: '2rem', borderRadius: '24px', background: 'rgba(255,255,255,0.03)', border: '1px solid var(--ent-border)' }}>
+                  <h2 className="section-title" style={{ fontSize: '1.25rem', fontWeight: 800, marginBottom: '1.5rem' }}>Environmental Context</h2>
+                  <div className="weather-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                    <div className="weather-stat large" style={{ gridColumn: 'span 2', padding: '1.5rem', background: 'rgba(15, 23, 42, 0.4)', borderRadius: '16px', textAlign: 'center' }}>
+                      <div className="w-val" style={{ fontSize: '2.5rem', fontWeight: 900 }}>29°C</div>
+                      <div className="w-label" style={{ fontSize: '0.7rem', color: '#64748b', fontWeight: 800 }}>TEMPERATURE</div>
+                    </div>
+                    <div className="weather-stat" style={{ padding: '1rem', background: 'rgba(15, 23, 42, 0.4)', borderRadius: '16px', textAlign: 'center' }}>
+                      <div className="w-val" style={{ fontSize: '1.2rem', fontWeight: 900 }}>65%</div>
+                      <div className="w-label" style={{ fontSize: '0.6rem', color: '#64748b', fontWeight: 800 }}>HUMIDITY</div>
+                    </div>
+                    <div className="weather-stat" style={{ padding: '1rem', background: 'rgba(15, 23, 42, 0.4)', borderRadius: '16px', textAlign: 'center' }}>
+                      <div className="w-val" style={{ fontSize: '1.2rem', fontWeight: 900 }}>1.2m</div>
+                      <div className="w-label" style={{ fontSize: '0.6rem', color: '#64748b', fontWeight: 800 }}>WAVE HEIGHT</div>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {selectedView === 'Alerts Timeline' && (
+            <div className="alerts-full-page glass-morph" style={{ padding: '2rem', borderRadius: '24px', background: 'rgba(255,255,255,0.03)', border: '1px solid var(--ent-border)' }}>
+              <h2 className="section-title" style={{ fontSize: '1.25rem', fontWeight: 800, marginBottom: '2rem' }}>Critical Alerts Timeline</h2>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                {MOCK_ANALYTICS.insights.map((ins, i) => (
+                  <div key={i} className="insight-item glass-morph" style={{ padding: '1.25rem', background: 'rgba(244, 63, 94, 0.05)', borderLeft: '4px solid #f43f5e', borderRadius: '8px' }}>
+                    <div style={{ fontSize: '0.9rem', color: '#f8fafc', lineHeight: 1.5 }}>{ins}</div>
+                    <div style={{ fontSize: '0.7rem', color: '#64748b', fontWeight: 800, marginTop: '0.75rem', letterSpacing: '0.05em' }}>TIMESTAMP: T+{(i+1)*4}M · PRIORITY: CRITICAL · NODE: CC-04</div>
                   </div>
                 ))}
               </div>
-            </section>
-          </div>
-        </main>
+            </div>
+          )}
+        </div>
       </div>
+      <style>{`
+        @keyframes ticker {
+          0% { transform: translateX(0); }
+          100% { transform: translateX(-50%); }
+        }
+        .glass-morph { backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+      `}</style>
     </AdminLayout>
   );
 }
