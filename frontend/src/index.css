@@ -1278,17 +1278,17 @@ p { line-height: 1.6; }
   margin-bottom: 1.5rem;
 }
 
-/* SPLIT LAYOUTS */
+/* SPLIT LAYOUTS - STACKED FOR VERTICAL FLOW */
 .dashboard-mid-split {
   display: grid;
-  grid-template-columns: 2fr 1fr;
+  grid-template-columns: 1fr;
   gap: 2rem;
   margin-top: 2rem;
 }
 
 .dashboard-bottom-split {
   display: grid;
-  grid-template-columns: 1.5fr 1fr;
+  grid-template-columns: 1fr;
   gap: 2rem;
   margin-top: 2rem;
 }
@@ -1296,7 +1296,6 @@ p { line-height: 1.6; }
 /* HOTSPOT MONITOR GRID */
 .hotspot-monitor-section {
   padding: 1.5rem;
-  max-height: 500px;
   display: flex;
   flex-direction: column;
 }
@@ -1305,8 +1304,6 @@ p { line-height: 1.6; }
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
   gap: 1rem;
-  overflow-y: auto;
-  padding-right: 0.5rem;
   margin-top: 1rem;
 }
 

@@ -45,7 +45,7 @@ const MOCK_ANALYTICS = {
     count: 500 + Math.floor(Math.random() * 2000)
   })),
   insights: [
-    `AI Predict: Calangute Beach peak load @ ${new Date(Date.now() + 7200000).toLocaleTimeString([], {hour: '2.digit', minute:'2.digit'})} (94% prob).`,
+    `AI Predict: Calangute Beach peak load @ ${new Date(Date.now() + 7200000).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})} (94% prob).`,
     "Regional Shift: Precipitation in North Goa driving 22% surge in Old Goa heritage visits.",
     "Baga-Anjuna Corridor: Congestion detected. Nudge deployment recommended for alternative routes.",
     "Dudhsagar Entry: 98% capacity reached. Slotting system active. System latency: 24ms."
