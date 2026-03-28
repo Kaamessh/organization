@@ -129,7 +129,12 @@ export default function AdminLayout({ children }) {
               className={({ isActive }) => `sidebar-link${isActive ? ' active' : ''}`}
             >
               <span className="sidebar-icon">{icon}</span>
-              {!collapsed && <span className="sidebar-label">{label}</span>}
+              {!collapsed && (
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
+                  <span className="sidebar-label">{label}</span>
+                  {to === '/analytics' && <span style={{ fontSize: '0.55rem', background: '#38bdf8', color: '#0f172a', padding: '1px 4px', borderRadius: '3px', fontWeight: 900, marginLeft: '8px' }}>NEW</span>}
+                </div>
+              )}
             </NavLink>
           ))}
           

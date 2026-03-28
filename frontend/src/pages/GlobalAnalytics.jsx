@@ -73,10 +73,10 @@ export default function GlobalAnalytics() {
   return (
     <AdminLayout>
       <div className="enterprise-theme dashboard-analytics" style={{ padding: '1rem', minHeight: '100vh', background: 'var(--ent-bg)', color: '#f8fafc', overflowX: 'hidden' }}>
-        <header className="dashboard-header-flex" style={{ marginBottom: '2.5rem' }}>
+        <header className="dashboard-header-flex" style={{ marginBottom: '2.5rem', borderBottom: '1px solid rgba(56, 189, 248, 0.2)', paddingBottom: '1.5rem' }}>
           <div className="header-main-row" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
             <div className="header-left">
-              <h1 className="dashboard-main-title" style={{ fontSize: '2.5rem', fontWeight: 900, letterSpacing: '-0.05em', margin: 0 }}>Global Analytics Node</h1>
+              <h1 className="dashboard-main-title" style={{ fontSize: '2.5rem', fontWeight: 900, letterSpacing: '-0.05em', margin: 0 }}>Global Analytics Node <span style={{ fontSize: '0.8rem', background: '#38bdf8', color: '#0f172a', padding: '2px 8px', borderRadius: '4px', verticalAlign: 'middle', marginLeft: '10px' }}>LIVE v2</span></h1>
               <p className="dashboard-main-subtitle" style={{ fontSize: '0.8rem', fontWeight: 800, color: '#38bdf8', letterSpacing: '0.2em', textTransform: 'uppercase', margin: '0.25rem 0 0' }}>MACRO-TREND INTELLIGENCE & PREDICTIVE MODELING</p>
             </div>
             
@@ -84,11 +84,11 @@ export default function GlobalAnalytics() {
               <button 
                 className="view-selector-btn glass-morph primary-trigger" 
                 onClick={() => setShowDropdown(!showDropdown)}
-                style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.75rem 1.25rem', border: '1px solid var(--ent-border)', borderRadius: '12px', cursor: 'pointer', background: 'rgba(56, 189, 248, 0.1)', color: '#f8fafc', fontWeight: 700 }}
+                style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.85rem 1.5rem', border: '2px solid #38bdf8', borderRadius: '12px', cursor: 'pointer', background: 'rgba(56, 189, 248, 0.2)', color: '#fff', fontWeight: 900, boxShadow: '0 0 15px rgba(56, 189, 248, 0.4)' }}
               >
-                <Users size={16} color="#38bdf8" />
-                <span>{selectedView}</span>
-                <ChevronDown size={14} style={{ marginLeft: '0.5rem', opacity: 0.6 }} />
+                <Users size={18} color="#fff" />
+                <span style={{ textShadow: '0 0 10px rgba(255,255,255,0.5)' }}>{selectedView === 'All Insights' ? 'All Insights' : `${Object.keys(VIEWS).find(key => VIEWS[key].includes(selectedView))} / ${selectedView}`}</span>
+                <ChevronDown size={14} style={{ marginLeft: '0.5rem', opacity: 0.9 }} />
               </button>
 
               {showDropdown && (
