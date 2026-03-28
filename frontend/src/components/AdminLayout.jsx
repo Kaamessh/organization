@@ -39,14 +39,26 @@ export default function AdminLayout({ children }) {
     };
     fetchActiveSOS();
 
-    console.log("📡 HQ: Opening Realtime Channel for SOS...");
+    console.log("📡 HQ: Opening Realtime Multi-Channel for SOS...");
     const channel = supabase
-      .channel('sos-global')
+      .channel('sos-emergency-line', {
+        config: {
+          broadcast: { self: true },
+        },
+      })
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'sos_alerts' }, payload => {
-        console.log("🆘 NEW SOS INSERT DETECTED:", payload);
+        console.log("🆘 DATABASE SOS DETECTED:", payload);
         if (payload.new.status === 'active') {
           setActiveSOS(payload.new);
         }
+      })
+      .on('broadcast', { event: 'emergency' }, ({ payload }) => {
+        console.log("🚨 DIRECT BROADCAST SOS RECEIVED:", payload);
+        setActiveSOS({
+          id: 'broadcast-' + Date.now(),
+          location_name: payload.location_name,
+          status: 'active'
+        });
       })
       .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'sos_alerts' }, payload => {
         console.log("🔄 SOS UPDATE DETECTED:", payload);
