@@ -4,7 +4,15 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>frontend</title>
+    <title>AURA Officer Portal</title>
+    <script>
+      window.addEventListener('error', function(e) {
+        console.log("🔥 GLOBAL ERROR CAPTURED:", e.message, "in", e.filename);
+      }, true);
+      window.addEventListener('unhandledrejection', function(e) {
+        console.log("🔥 PROMISE REJECTION:", e.reason);
+      });
+    </script>
   </head>
   <body>
     <script>console.log("📜 AURA HTML: Looking for JS module...");</script>
