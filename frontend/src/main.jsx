@@ -1,10 +1,8 @@
-import { StrictMode } from 'react'
+import React from 'react'
 import { createRoot } from 'react-dom/client'
-import './index.css'
-import App from './App.jsx'
 
 createRoot(document.getElementById('root')).render(
-  <StrictMode>
-    <App />
-  </StrictMode>,
+  <div style={{ padding: '50px', background: 'blue', color: 'white', fontSize: '40px' }}>
+    🚀 AURA SYSTEM ONLINE - IF YOU SEE THIS, THE BUILD IS WORKING!
+  </div>
 )
