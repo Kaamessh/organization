@@ -28,26 +28,34 @@ export default function AdminLayout({ children }) {
 
     // 1. Fetch any current active SOS
     const fetchActiveSOS = async () => {
-      const { data } = await supabase.from('sos_alerts').select('*').eq('status', 'active').order('created_at', { ascending: false }).limit(1);
-      if (data && data.length > 0) setActiveSOS(data[0]);
+      console.log("🕵️ HQ: Fetching initial SOS alerts...");
+      const { data, error } = await supabase.from('sos_alerts').select('*').eq('status', 'active').order('created_at', { ascending: false }).limit(1);
+      if (error) console.error("❌ HQ SOS Fetch Error:", error);
+      if (data && data.length > 0) {
+        console.log("🚨 HQ: Found active SOS on mount:", data[0]);
+        setActiveSOS(data[0]);
+      }
     };
     fetchActiveSOS();
 
-    // 2. Listen for NEW SOS alerts
+    console.log("📡 HQ: Opening Realtime Channel for SOS...");
     const channel = supabase
       .channel('sos-global')
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'sos_alerts' }, payload => {
+        console.log("🆘 NEW SOS INSERT DETECTED:", payload);
         if (payload.new.status === 'active') {
           setActiveSOS(payload.new);
-          // Play a sound if possible (optional: alert('🚨 SOS TRIGGERED!'))
         }
       })
       .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'sos_alerts' }, payload => {
-        if (payload.new.status === 'resolved' && activeSOS?.id === payload.new.id) {
+        console.log("🔄 SOS UPDATE DETECTED:", payload);
+        if (payload.new.status === 'resolved' && (activeSOS?.id === payload.new.id || !activeSOS)) {
           setActiveSOS(null);
         }
       })
-      .subscribe();
+      .subscribe((status) => {
+        console.log("🔌 HQ SOS Subscription Status:", status);
+      });
 
     return () => { supabase.removeChannel(channel); };
   }, [activeSOS?.id]);
