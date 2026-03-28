@@ -28,30 +28,37 @@ export default function AdminLayout({ children }) {
 
     // 1. Fetch any current active SOS
     const fetchActiveSOS = async () => {
-      const { data } = await supabase.from('sos_alerts').select('*').eq('status', 'active').order('created_at', { ascending: false }).limit(1);
+      console.log("🕵️ HQ: Fetching initial SOS alerts...");
+      const { data, error } = await supabase.from('sos_alerts').select('*').eq('status', 'active').order('created_at', { ascending: false }).limit(1);
+      if (error) console.error("❌ HQ SOS Fetch Error:", error);
       if (data && data.length > 0) {
+        console.log("🚨 HQ: Found active SOS on mount:", data[0]);
         setActiveSOS(data[0]);
       }
     };
     fetchActiveSOS();
 
-    // 2. Listen for Real-Time SOS signals
+    console.log("📡 HQ: Opening Realtime Channel for SOS...");
     const channel = supabase
       .channel('sos-global')
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'sos_alerts' }, payload => {
+        console.log("🆘 NEW SOS INSERT DETECTED:", payload);
         if (payload.new.status === 'active') {
           setActiveSOS(payload.new);
         }
       })
       .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'sos_alerts' }, payload => {
+        console.log("🔄 SOS UPDATE DETECTED:", payload);
         if (payload.new.status === 'resolved' && (activeSOS?.id === payload.new.id || !activeSOS)) {
           setActiveSOS(null);
         }
       })
-      .subscribe();
+      .subscribe((status) => {
+        console.log("🔌 HQ SOS Subscription Status:", status);
+      });
 
     return () => { supabase.removeChannel(channel); };
-  }, [activeSOS?.id]);
+  }, []); // Only run on mount to keep connection stable
 
   const handleResolveSOS = async () => {
     if (!activeSOS) return;
@@ -68,7 +75,7 @@ export default function AdminLayout({ children }) {
 
   return (
     <>
-      {/* GLOBAL SOS ALARM BANNER */}
+      {/* GLOBAL SOS ALARM BANNER - MOVED OUTSIDE FOR SAFETY */}
       {activeSOS && (
         <div className="sos-alarm-banner">
           <div className="sos-msg">
@@ -83,26 +90,29 @@ export default function AdminLayout({ children }) {
       )}
 
       <div className="admin-layout">
-        <aside className={`admin-sidebar${collapsed ? ' collapsed' : ''}`}>
-          <div className="sidebar-brand" onClick={() => setCollapsed(p => !p)}>
-            <ShieldAlert size={24} color="var(--accent-brand)" />
-            {!collapsed && <span>AURA<strong> HQ</strong></span>}
-            {collapsed ? <ChevronRight size={16} color="var(--text-muted)" /> : <Menu size={16} color="var(--text-muted)" />}
-          </div>
 
-          <nav className="sidebar-nav">
-            {NAV_ITEMS.map(({ to, icon, label, exact }) => (
-              <NavLink
-                key={to}
-                to={to}
-                end={exact}
-                className={({ isActive }) => `sidebar-link${isActive ? ' active' : ''}`}
-              >
-                <span className="sidebar-icon">{icon}</span>
-                {!collapsed && <span className="sidebar-label">{label}</span>}
-              </NavLink>
-            ))}
-          </nav>
+      {/* SIDEBAR */}
+      <aside className={`admin-sidebar${collapsed ? ' collapsed' : ''}`}>
+        <div className="sidebar-brand" onClick={() => setCollapsed(p => !p)}>
+          <ShieldAlert size={24} color="var(--accent-brand)" />
+          {!collapsed && <span>AURA<strong> HQ</strong></span>}
+          {collapsed ? <ChevronRight size={16} color="var(--text-muted)" /> : <Menu size={16} color="var(--text-muted)" />}
+        </div>
+
+        <nav className="sidebar-nav">
+          {NAV_ITEMS.map(({ to, icon, label, exact }) => (
+            <NavLink
+              key={to}
+              to={to}
+              end={exact}
+              className={({ isActive }) => `sidebar-link${isActive ? ' active' : ''}`}
+            >
+              <span className="sidebar-icon">{icon}</span>
+              {!collapsed && <span className="sidebar-label">{label}</span>}
+            </NavLink>
+          ))}
+          
+        </nav>
 
         {/* Officer Profile at bottom */}
         <div className="sidebar-footer">
