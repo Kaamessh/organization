@@ -24,7 +24,24 @@ const HOTSPOT_CAPACITIES = {
   "Mandovi River cruise": 1500,
   "Chapora Fort": 2000,
   "Se Cathedral": 2500,
-  "Vagator Beach": 4000
+  "Vagator Beach": 4000,
+  // Hidden Gems
+  "Butterfly Beach Goa": 800,
+  "Galgibaga Beach": 1000,
+  "Divar Island": 1200,
+  "Cabo de Rama Fort": 1500,
+  "Netravali Bubbling Lake": 500,
+  "Harvalem Waterfalls": 800,
+  "Chorla Ghat": 1000,
+  "Cola Beach": 700,
+  "Fontainhas": 1200,
+  "Kadamba Shri Mahadeva Temple": 900,
+  "Kakolem Beach": 600,
+  "Tambdi Surla Temple & Falls": 1000,
+  "Agonda Beach": 2000,
+  "Colva Beach (off-peak stretches)": 2500,
+  "Sada Waterfalls near Ponda": 500,
+  "Spice farms near Ponda": 1000
 };
 
 const HIDDEN_GEMS = [
@@ -92,6 +109,7 @@ export default function OfficerDashboard() {
   const [selectedDay, setSelectedDay] = useState(0);
   const [nudgeStatus, setNudgeStatus] = useState('');
   const [username, setUsername] = useState('Officer');
+  const [capacitySearch, setCapacitySearch] = useState('');
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -212,7 +230,14 @@ export default function OfficerDashboard() {
             <optgroup label="Popular Hotspots">
               {HOTSPOTS.map(h => <option key={h} value={h}>{h}</option>)}
             </optgroup>
+            <optgroup label="Hidden Gems (Reserve Locations)">
+              {HIDDEN_GEMS.map(g => <option key={g} value={g}>{g}</option>)}
+            </optgroup>
           </select>
+          <div className="capacity-badge">
+             <span className="label">MAX CAP:</span>
+             <span className="value">{activeCapacity.toLocaleString()}</span>
+          </div>
           <button
             className="ent-btn-primary"
             style={{ cursor: 'not-allowed', opacity: 0.8 }}
@@ -333,6 +358,48 @@ export default function OfficerDashboard() {
                    'DEPLOY INVISIBLE NUDGE'}
                </button>
              </div>
+          </section>
+
+          {/* New Section: Master Capacity Overview */}
+          <section className="ent-capacity-overview">
+            <div className="capacity-grid-header">
+              <h2><ShieldAlert size={24} /> AURA Global Infrastructure: Capacity Audit</h2>
+              <div className="capacity-search">
+                 <input 
+                   type="text" 
+                   placeholder="Search all 29 locations..." 
+                   value={capacitySearch}
+                   onChange={(e) => setCapacitySearch(e.target.value)}
+                 />
+              </div>
+            </div>
+            <div className="capacity-list-grid">
+              {[...HOTSPOTS, ...HIDDEN_GEMS]
+                .filter(name => name.toLowerCase().includes(capacitySearch.toLowerCase()))
+                .map(name => {
+                  const cap = HOTSPOT_CAPACITIES[name] || 0;
+                  const isLowCap = cap < 1000;
+                  return (
+                    <div key={name} className="capacity-stat-card" onClick={() => setSelectedHotspot(name)}>
+                      <div className="card-top">
+                        <strong>{name}</strong>
+                        <span className={`status-badge ${isLowCap ? 'low' : 'high'}`}>
+                          {isLowCap ? 'Limited' : 'High Cap'}
+                        </span>
+                      </div>
+                      <div className="card-body">
+                         <div className="cap-val">
+                           <span className="val">{cap.toLocaleString()}</span>
+                           <span className="unit">visitors max</span>
+                         </div>
+                         <div className="progress-bg">
+                            <div className="progress-fill" style={{ width: '40%' }}></div>
+                         </div>
+                      </div>
+                    </div>
+                  );
+                })}
+            </div>
           </section>
         </main>
       )}
