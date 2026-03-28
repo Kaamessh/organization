@@ -74,8 +74,8 @@ export default function AdminLayout({ children }) {
   };
 
   return (
-    <div className="admin-layout">
-      {/* GLOBAL SOS ALARM BANNER */}
+    <>
+      {/* GLOBAL SOS ALARM BANNER - MOVED OUTSIDE FOR SAFETY */}
       {activeSOS && (
         <div className="sos-alarm-banner">
           <div className="sos-msg">
@@ -88,6 +88,8 @@ export default function AdminLayout({ children }) {
           </button>
         </div>
       )}
+
+      <div className="admin-layout">
 
       {/* SIDEBAR */}
       <aside className={`admin-sidebar${collapsed ? ' collapsed' : ''}`}>
@@ -109,6 +111,28 @@ export default function AdminLayout({ children }) {
               {!collapsed && <span className="sidebar-label">{label}</span>}
             </NavLink>
           ))}
+          
+          {/* MANUAL SOS TEST TRIGGER */}
+          <button 
+            onClick={() => setActiveSOS({ id: 'test', location_name: 'MANUAL TEST' })}
+            style={{ 
+              marginTop: '1rem', 
+              background: 'rgba(225, 29, 72, 0.1)', 
+              border: '1px dashed #e11d48', 
+              color: '#e11d48', 
+              padding: '8px', 
+              borderRadius: '8px',
+              fontSize: '0.7rem',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              marginLeft: collapsed ? '0' : '10px'
+            }}
+          >
+            <ShieldAlert size={14} />
+            {!collapsed && <span>Test Alert UI</span>}
+          </button>
         </nav>
 
         {/* Officer Profile at bottom */}
@@ -137,5 +161,6 @@ export default function AdminLayout({ children }) {
         {children}
       </main>
     </div>
+    </>
   );
 }
