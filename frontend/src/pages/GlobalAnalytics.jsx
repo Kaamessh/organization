@@ -17,10 +17,10 @@ const LOCATIONS = [
 
 const MOCK_ANALYTICS = {
   kpis: [
-    { label: "Total Footfall (YTD)", value: "1.24M", trend: "+12.4%", up: true, icon: <Users size={24} color="#38bdf8" /> },
-    { label: "System Stress Index", value: "High", trend: "7 Hotspots Critical", up: false, icon: <AlertCircle size={24} color="#fb7185" /> },
-    { label: "AI Forecast Accuracy", value: "97.2%", trend: "±31 visitors", up: true, icon: <Target size={24} color="#fbbf24" /> },
-    { label: "Active Diversions", value: "14", trend: "+2 since 08:00", up: true, icon: <TrendingUp size={24} color="#34d399" /> },
+    { label: "Total Footfall (YTD)", value: "1,524,082", trend: "+14.2% YoY", up: true, icon: <Users size={24} color="#38bdf8" /> },
+    { label: "System Stress Index", value: "ELEVATED", trend: "9 Hotspots Critical", up: false, icon: <AlertCircle size={24} color="#fb7185" /> },
+    { label: "AI Forecast Accuracy", value: "98.91%", trend: "±12 visitors", up: true, icon: <Target size={24} color="#fbbf24" /> },
+    { label: "Active Diversions", value: "18", trend: "+4 since 08:00", up: true, icon: <TrendingUp size={24} color="#34d399" /> },
   ],
   trend: Array.from({ length: 12 }, (_, i) => ({
     month: ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][i],
@@ -45,10 +45,10 @@ const MOCK_ANALYTICS = {
     count: 500 + Math.floor(Math.random() * 2000)
   })),
   insights: [
-    "AI Prediction: Calangute Beach likely to exceed 95% capacity by 15:30 IST.",
-    "Weather Impact: Oncoming rain in North Goa diverting 15% traffic to Se Cathedral.",
-    "Trend Alert: Divar Island seeing unprecedented 45% MoM explorer growth.",
-    "System Alert: Chapora Fort parking at 100% capacity. Deployment of nudges recommended."
+    `AI Predict: Calangute Beach peak load @ ${new Date(Date.now() + 7200000).toLocaleTimeString([], {hour: '2.digit', minute:'2.digit'})} (94% prob).`,
+    "Regional Shift: Precipitation in North Goa driving 22% surge in Old Goa heritage visits.",
+    "Baga-Anjuna Corridor: Congestion detected. Nudge deployment recommended for alternative routes.",
+    "Dudhsagar Entry: 98% capacity reached. Slotting system active. System latency: 24ms."
   ]
 };
 
@@ -78,6 +78,10 @@ export default function GlobalAnalytics() {
             </div>
           </div>
           <div className="ent-controls">
+             <div className="capacity-badge" style={{ borderColor: 'rgba(56,189,248,0.3)', background: 'rgba(56,189,248,0.1)' }}>
+                <span className="label" style={{ color: '#38bdf8' }}>LATENCY:</span>
+                <span className="value">24ms</span>
+             </div>
              <div className="capacity-badge" style={{ borderColor: 'rgba(16,185,129,0.3)', background: 'rgba(16,185,129,0.1)' }}>
                 <span className="label" style={{ color: '#10B981' }}>SYSTEM HEALTH:</span>
                 <span className="value">OPTIMAL</span>
@@ -129,6 +133,22 @@ export default function GlobalAnalytics() {
                 <svg viewBox="0 0 100 40" preserveAspectRatio="none" style={{ width: '100%', height: '100%', overflow: 'visible' }}>
                   <path d={`M ${points.filter(p => !p.isForecast || p.x === points[9].x).map(p => `${p.x},${p.y * 0.4}`).join(' L ')}`} fill="none" stroke="#38bdf8" strokeWidth="1.5" strokeLinecap="round" />
                   <path d={`M ${points.filter((p, i) => i >= 9).map(p => `${p.x},${p.y * 0.4}`).join(' L ')}`} fill="none" stroke="#34d399" strokeWidth="1.5" strokeDasharray="2,1" />
+
+                  {/* DATA LABELS */}
+                  {points.map((p, i) => (
+                    i % 2 === 0 && (
+                      <text 
+                        key={`val-${i}`} 
+                        x={p.x} y={p.y * 0.4 - 2} 
+                        fill={p.isForecast ? "#34d399" : "#38bdf8"} 
+                        fontSize="1.5" 
+                        fontWeight="700"
+                        textAnchor="middle"
+                      >
+                        {MOCK_ANALYTICS.trend[i].hist || MOCK_ANALYTICS.trend[i].forecast}k
+                      </text>
+                    )
+                  ))}
                 </svg>
               </div>
 
