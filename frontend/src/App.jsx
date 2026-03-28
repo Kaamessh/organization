@@ -56,7 +56,7 @@ function App() {
   );
 }
           <Route path="/login" element={<Login />} />
-          <Route path="/developer" element={<DeveloperSetup />} />
+          <Route path="/developer-setup" element={<DeveloperSetup />} />
         </Routes>
       </div>
     </Router>
