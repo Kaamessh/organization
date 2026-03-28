@@ -1,7 +1,7 @@
 import { createClient } from '@supabase/supabase-js'
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || "https://hvmgxmopyzslenzyzjdg.supabase.co"
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh2bWd4bW9weXpzbGVuenl6amRnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ2MTQ0MzUsImV4cCI6MjA5MDE5MDQzNX0.axJZsxHdRhtW4k9ggZ5IhwlIkYLszuSDdYrUk_CIbZM"
 
 // Safely create the client - if env vars are missing, return a mock that won't crash React
 let supabase;
