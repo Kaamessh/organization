@@ -221,20 +221,6 @@ export default function OfficerDashboard() {
           >
             {loading ? 'Analyzing Neural Nets...' : 'Auto-Sync Active'}
           </button>
-          {/* Profile Avatar */}
-          <button
-            onClick={() => navigate('/settings')}
-            title="Profile & Settings"
-            style={{ display: 'flex', alignItems: 'center', gap: '0.7rem', background: 'var(--ent-panel)', border: '1px solid var(--ent-border)', borderRadius: '40px', padding: '0.4rem 1rem 0.4rem 0.4rem', cursor: 'pointer', transition: 'border-color 0.2s' }}
-            onMouseOver={(e) => e.currentTarget.style.borderColor = 'var(--accent-brand)'}
-            onMouseOut={(e) => e.currentTarget.style.borderColor = 'var(--ent-border)'}
-          >
-            <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: 'linear-gradient(135deg, var(--accent-brand), #7c3aed)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: '1rem', color: 'white', flexShrink: 0 }}>
-              {username[0].toUpperCase()}
-            </div>
-            <span style={{ color: 'white', fontWeight: 700, fontSize: '0.95rem', whiteSpace: 'nowrap' }}>{username}</span>
-            <Settings size={14} color="var(--text-muted)" />
-          </button>
         </div>
       </header>
 
