@@ -17,6 +17,7 @@ export default function AdminLayout({ children }) {
   const [collapsed, setCollapsed] = useState(false);
   const [username, setUsername] = useState('Officer');
   const [activeSOS, setActiveSOS] = useState(null);
+  const [connStatus, setConnStatus] = useState('connecting'); // connecting, subscribed, error
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -55,6 +56,7 @@ export default function AdminLayout({ children }) {
       })
       .subscribe((status) => {
         console.log("🔌 HQ SOS Subscription Status:", status);
+        setConnStatus(status === 'SUBSCRIBED' ? 'subscribed' : 'error');
       });
 
     return () => { supabase.removeChannel(channel); };
@@ -113,6 +115,32 @@ export default function AdminLayout({ children }) {
           ))}
           
         </nav>
+
+        {/* CONNECTION STATUS INDICATOR */}
+        {!collapsed && (
+          <div style={{ padding: '0 20px', marginBottom: '10px' }}>
+            <div style={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              gap: '8px', 
+              fontSize: '0.65rem', 
+              color: connStatus === 'subscribed' ? '#22c55e' : '#ef4444',
+              background: 'rgba(255,255,255,0.05)',
+              padding: '6px 10px',
+              borderRadius: '20px',
+              width: 'fit-content'
+            }}>
+              <div style={{ 
+                width: '6px', 
+                height: '6px', 
+                borderRadius: '50%', 
+                backgroundColor: connStatus === 'subscribed' ? '#22c55e' : '#ef4444',
+                boxShadow: connStatus === 'subscribed' ? '0 0 8px #22c55e' : 'none'
+              }} />
+              {connStatus === 'subscribed' ? 'LIVE NETWORK ACTIVE' : 'NETWORK OFFLINE'}
+            </div>
+          </div>
+        )}
 
         {/* Officer Profile at bottom */}
         <div className="sidebar-footer">

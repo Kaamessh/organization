@@ -9,9 +9,10 @@ try {
   if (!supabaseUrl || !supabaseAnonKey) {
     throw new Error('Missing Supabase environment variables in Vercel settings.');
   }
+  console.log("🚀 AURA: Supabase Client Initialized with Real Credentials!");
   supabase = createClient(supabaseUrl, supabaseAnonKey);
 } catch (e) {
-  console.warn('⚠️ AURA: Supabase not configured. App will show config error screen.', e.message);
+  console.warn('⚠️ AURA: Supabase not configured. Using Mock Client (No Realtime).', e.message);
   // Return a safe mock object so the app can mount without crashing
   supabase = {
     auth: {
