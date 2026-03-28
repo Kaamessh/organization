@@ -60,6 +60,11 @@ export default function AdminLayout({ children }) {
           status: 'active'
         });
       })
+      .on('broadcast', { event: 'ping' }, () => {
+        console.log("🏓 NETWORK PING RECEIVED!");
+        setConnStatus('ping-received');
+        setTimeout(() => setConnStatus('subscribed'), 2000);
+      })
       .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'sos_alerts' }, payload => {
         console.log("🔄 SOS UPDATE DETECTED:", payload);
         if (payload.new.status === 'resolved' && (activeSOS?.id === payload.new.id || !activeSOS)) {
@@ -149,7 +154,7 @@ export default function AdminLayout({ children }) {
                 backgroundColor: connStatus === 'subscribed' ? '#22c55e' : '#ef4444',
                 boxShadow: connStatus === 'subscribed' ? '0 0 8px #22c55e' : 'none'
               }} />
-              {connStatus === 'subscribed' ? 'LIVE NETWORK ACTIVE' : 'NETWORK OFFLINE'}
+              {connStatus === 'subscribed' ? 'LIVE NETWORK ACTIVE' : connStatus === 'ping-received' ? '🏓 PING RECEIVED! (NETWORK OK)' : 'NETWORK OFFLINE'}
             </div>
           </div>
         )}
