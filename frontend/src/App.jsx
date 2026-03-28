@@ -49,6 +49,13 @@ function App() {
           
           {/* Non-locked Routes */}
           <Route path="/login" element={<Login />} />
+          <Route path="/developer-setup" element={<DeveloperSetup />} />
+        </Routes>
+      </div>
+    </Router>
+  );
+}
+          <Route path="/login" element={<Login />} />
           <Route path="/developer" element={<DeveloperSetup />} />
         </Routes>
       </div>
