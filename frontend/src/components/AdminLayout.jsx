@@ -57,6 +57,7 @@ export default function AdminLayout({ children }) {
         setActiveSOS({
           id: 'broadcast-' + Date.now(),
           location_name: payload.location_name,
+          timestamp: payload.timestamp, // Extract timestamp
           status: 'active'
         });
       })
@@ -99,7 +100,7 @@ export default function AdminLayout({ children }) {
         <div className="sos-alarm-banner">
           <div className="sos-msg">
             <ShieldAlert size={32} />
-            🚨 CRITICAL INCIDENT: SOS BEACON ACTIVATED AT 
+            🚨 CRITICAL INCIDENT: SOS [ {new Date(activeSOS.timestamp || Date.now()).toLocaleTimeString()} ]
             <span className="sos-location-name">{activeSOS.location_name || 'UNKNOWN LOCATION'}</span>
           </div>
           <button className="btn-dispatch" onClick={handleResolveSOS}>
