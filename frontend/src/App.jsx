@@ -4,6 +4,7 @@ import { supabase } from './lib/supabaseClient';
 import OfficerDashboard from './pages/OfficerDashboard';
 import DeveloperSetup from './pages/DeveloperSetup';
 import Login from './pages/Login';
+import Settings from './pages/Settings';
 import './index.css';
 
 // Reusable wrapper to bounce unauthenticated users back to /login
@@ -40,13 +41,21 @@ function App() {
     <Router>
       <div className="app-container">
         <Routes>
-          <Route 
-            path="/" 
+          <Route
+            path="/"
             element={
               <PrivateRoute>
                 <OfficerDashboard />
               </PrivateRoute>
-            } 
+            }
+          />
+          <Route
+            path="/settings"
+            element={
+              <PrivateRoute>
+                <Settings />
+              </PrivateRoute>
+            }
           />
           <Route path="/login" element={<Login />} />
           <Route path="/developer-setup" element={<DeveloperSetup />} />

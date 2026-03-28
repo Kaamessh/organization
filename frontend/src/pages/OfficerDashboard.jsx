@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { ShieldAlert, Activity, Calendar, MapPin, AlertTriangle, ArrowRight } from 'lucide-react';
+import { ShieldAlert, Activity, Calendar, MapPin, AlertTriangle, ArrowRight, Settings } from 'lucide-react';
 import { supabase } from '../lib/supabaseClient';
 
 const HOTSPOTS = [
@@ -81,13 +82,24 @@ const generateDeterministicForecast = (maxCap, locationName) => {
 const getLocId = (name) => HOTSPOTS.indexOf(name) + 1;
 
 export default function OfficerDashboard() {
+  const navigate = useNavigate();
   const [selectedHotspot, setSelectedHotspot] = useState(HOTSPOTS[0]);
   const [selectedGem, setSelectedGem] = useState(HIDDEN_GEMS[0]);
-  const [activeCapacity, setActiveCapacity] = useState(6000); // Maps dynamically now
+  const [activeCapacity, setActiveCapacity] = useState(6000);
   const [forecastData, setForecastData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [selectedDay, setSelectedDay] = useState(0);
   const [nudgeStatus, setNudgeStatus] = useState('');
+  const [username, setUsername] = useState('Officer');
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) {
+        const meta = session.user.user_metadata;
+        setUsername(meta?.username || session.user.email?.split('@')[0] || 'Officer');
+      }
+    });
+  }, []);
 
   const today = new Date();
   const dateLabels = Array.from({length: 7}, (_, i) => {
@@ -98,6 +110,7 @@ export default function OfficerDashboard() {
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
+    navigate('/login');
   };
 
   // 1. Master Auto-Sync Engine (Attached directly to Dropdown State)
@@ -189,7 +202,7 @@ export default function OfficerDashboard() {
         </div>
         
         <div className="ent-controls">
-          <select 
+          <select
             className="ent-select"
             value={selectedHotspot}
             onChange={(e) => setSelectedHotspot(e.target.value)}
@@ -198,21 +211,27 @@ export default function OfficerDashboard() {
               {HOTSPOTS.map(h => <option key={h} value={h}>{h}</option>)}
             </optgroup>
           </select>
-          <button 
-            className="ent-btn-primary" 
+          <button
+            className="ent-btn-primary"
             style={{ cursor: 'not-allowed', opacity: 0.8 }}
             title="Auto-Sync Enabled"
             onClick={(e) => e.preventDefault()}
           >
             {loading ? 'Analyzing Neural Nets...' : 'Auto-Sync Active'}
           </button>
-          <button 
-            onClick={handleSignOut} 
-            style={{background: 'var(--ent-panel)', border: '1px solid var(--text-muted)', color: 'var(--text-muted)', cursor: 'pointer', padding: '0 1.2rem', borderRadius: '8px', fontWeight: 'bold', transition: '0.2s'}}
-            onMouseOver={(e) => { e.target.style.color = 'white'; e.target.style.borderColor = 'white'; }}
-            onMouseOut={(e) => { e.target.style.color = 'var(--text-muted)'; e.target.style.borderColor = 'var(--text-muted)'; }}
+          {/* Profile Avatar */}
+          <button
+            onClick={() => navigate('/settings')}
+            title="Profile & Settings"
+            style={{ display: 'flex', alignItems: 'center', gap: '0.7rem', background: 'var(--ent-panel)', border: '1px solid var(--ent-border)', borderRadius: '40px', padding: '0.4rem 1rem 0.4rem 0.4rem', cursor: 'pointer', transition: 'border-color 0.2s' }}
+            onMouseOver={(e) => e.currentTarget.style.borderColor = 'var(--accent-brand)'}
+            onMouseOut={(e) => e.currentTarget.style.borderColor = 'var(--ent-border)'}
           >
-            LOGOUT
+            <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: 'linear-gradient(135deg, var(--accent-brand), #7c3aed)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: '1rem', color: 'white', flexShrink: 0 }}>
+              {username[0].toUpperCase()}
+            </div>
+            <span style={{ color: 'white', fontWeight: 700, fontSize: '0.95rem', whiteSpace: 'nowrap' }}>{username}</span>
+            <Settings size={14} color="var(--text-muted)" />
           </button>
         </div>
       </header>
@@ -256,11 +275,15 @@ export default function OfficerDashboard() {
               </div>
             </div>
 
+            {/* Threshold label ABOVE the chart, never overlapping bars */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '0.8rem', paddingLeft: '0.5rem' }}>
+              <div style={{ flex: 1, borderTop: '2px dashed #E11D48', opacity: 0.7 }} />
+              <span style={{ color: '#E11D48', fontSize: '0.78rem', fontWeight: 800, letterSpacing: '1px', whiteSpace: 'nowrap', background: 'var(--ent-panel)', padding: '0.2rem 0.6rem', borderRadius: '4px', border: '1px solid rgba(225,29,72,0.3)' }}>
+                ⚠ 80% THRESHOLD — {(activeCapacity * 0.8).toLocaleString()} visitors
+              </span>
+              <div style={{ flex: 1, borderTop: '2px dashed #E11D48', opacity: 0.7 }} />
+            </div>
             <div className="chart-container">
-              <div className="threshold-line" style={{ bottom: `${((activeCapacity * 0.8) / (activeCapacity * 1.2)) * 100}%` }}>
-                <span>80% CAPACITY WARNING THRESHOLD ({(activeCapacity * 0.8).toLocaleString()})</span>
-              </div>
-              
               <div className="bars-wrapper">
                 {current24h.map((val, hr) => {
                   const percent = (val / (activeCapacity * 1.2)) * 100;
