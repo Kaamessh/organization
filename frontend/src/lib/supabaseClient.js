@@ -1,13 +1,10 @@
 import { createClient } from '@supabase/supabase-js'
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || "https://missing-url.supabase.co";
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || "missing-key";
 
-if (!supabaseUrl || !supabaseAnonKey) {
-  console.error("🚩 AURA ERROR: Supabase Environment Variables are MISSING! Ensure VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY are set in Vercel Settings.")
+if (!import.meta.env.VITE_SUPABASE_URL || !import.meta.env.VITE_SUPABASE_ANON_KEY) {
+  console.warn("⚠️ AURA CONFIG: Missing Vercel Environment Variables! The app is using a fallback to prevent a crash.");
 }
 
-export const supabase = createClient(
-  supabaseUrl || 'https://placeholder.supabase.co', 
-  supabaseAnonKey || 'placeholder_key'
-)
+export const supabase = createClient(supabaseUrl, supabaseAnonKey)
