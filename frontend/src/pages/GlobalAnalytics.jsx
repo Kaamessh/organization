@@ -24,8 +24,8 @@ const MOCK_ANALYTICS = {
   ],
   trend: Array.from({ length: 12 }, (_, i) => ({
     month: ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][i],
-    hist: i < 10 ? 80 + Math.random() * 40 : null,
-    forecast: i >= 9 ? 100 + Math.random() * 60 : null
+    hist: i < 10 ? Math.round(80 + Math.random() * 40) : null,
+    forecast: i >= 9 ? Math.round(100 + Math.random() * 60) : null
   })),
   hotspots: LOCATIONS.map((name, i) => {
     const capacity = 2000 + Math.floor(Math.random() * 8000);

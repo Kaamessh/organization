@@ -489,6 +489,14 @@ p { line-height: 1.6; }
   transition: margin-left 0.25s ease;
   min-height: 100vh;
 }
+
+/* RESPONSIVE SIDEBAR (High-density optimization) */
+@media (max-width: 1200px) {
+  .admin-sidebar { width: 68px; }
+  .admin-main { margin-left: 68px; }
+  .sidebar-label, .sidebar-username, .sidebar-user { display: none; }
+}
+
 .admin-sidebar.collapsed ~ .admin-main {
   margin-left: 68px;
 }
@@ -1190,12 +1198,25 @@ p { line-height: 1.6; }
   --accent-red-glow: rgba(251, 113, 133, 0.3);
 }
 
+/* ============================================
+   RESPONSIVENESS & WIDTH LOCKS (FINAL JURY POLISH)
+   ============================================ */
+.admin-layout {
+  overflow-x: hidden; /* Absolute lock on horizontal scroll */
+}
+
 .enterprise-theme {
   background: var(--ent-bg);
   min-height: 100vh;
   color: #f8fafc;
   padding: 2rem;
   font-family: 'Inter', sans-serif;
+  overflow-x: hidden; /* Local lock */
+}
+
+/* Fluid Heatmap Bars */
+.h-bar-v-fill {
+  width: min(60%, 15px); /* Ensure bars don't grow too fat or overflow */
 }
 
 .glass-morph {
@@ -1301,13 +1322,16 @@ p { line-height: 1.6; }
 }
 
 .hotspot-scroll-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  display: flex;
+  flex-wrap: wrap;
   gap: 1rem;
   margin-top: 1rem;
 }
 
 .hotspot-mini-card {
+  flex: 1 1 280px; /* Fluid base width of 280px, stacks automatically */
+  min-width: 250px;
+  max-width: 100%;
   padding: 1rem;
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.05);
@@ -1451,6 +1475,50 @@ p { line-height: 1.6; }
 .dot { width: 8px; height: 8px; border-radius: 50%; }
 .dot.hist { background: #38bdf8; }
 .dot.fore { background: #34d399; }
+
+/* RESPONSIVE BREAKPOINTS - PLACED AT BOTTOM TO ENSURE OVERRIDE */
+@media (max-width: 1200px) {
+  .page-container, .enterprise-theme { padding: 1.5rem; }
+  .ticker-item { padding: 0 1.5rem; } 
+  .chart-svg-container-high text { display: none !important; } 
+}
+
+@media (max-width: 1100px) {
+  .hotspot-scroll-grid {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); /* Pack tighter to prevent 3-column clipping */
+  }
+}
+
+@media (max-width: 1024px) {
+  .admin-sidebar { width: 68px; }
+  .admin-main { margin-left: 68px; }
+  .sidebar-label, .sidebar-username, .sidebar-user { display: none; }
+  
+  .dashboard-kpi-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .enterprise-theme { padding: 1rem; }
+  .section-title { font-size: 1rem; }
+  
+  .dashboard-kpi-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .ticker-label { padding: 0 0.8rem; font-size: 0.6rem; }
+  .ticker-item { padding: 0 1rem; font-size: 0.75rem; }
+
+  .hotspot-scroll-grid {
+    grid-template-columns: 1fr; /* Single column stack for mobile clarity */
+  }
+
+  .h-name { font-size: 0.65rem; }
+  .h-bar-time { display: none; }
+  
+  .chart-svg-container-high { height: 120px; }
+}
 
 
 
