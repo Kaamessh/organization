@@ -16,6 +16,7 @@ export default function AdminLayout({ children }) {
   const navigate = useNavigate();
   const [collapsed, setCollapsed] = useState(false);
   const [username, setUsername] = useState('Officer');
+  const [activeSOS, setActiveSOS] = useState(null);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -24,7 +25,40 @@ export default function AdminLayout({ children }) {
         setUsername(meta?.username || session.user.email?.split('@')[0] || 'Officer');
       }
     });
-  }, []);
+
+    // 1. Fetch any current active SOS
+    const fetchActiveSOS = async () => {
+      const { data } = await supabase.from('sos_alerts').select('*').eq('status', 'active').order('created_at', { ascending: false }).limit(1);
+      if (data && data.length > 0) setActiveSOS(data[0]);
+    };
+    fetchActiveSOS();
+
+    // 2. Listen for NEW SOS alerts
+    const channel = supabase
+      .channel('sos-global')
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'sos_alerts' }, payload => {
+        if (payload.new.status === 'active') {
+          setActiveSOS(payload.new);
+          // Play a sound if possible (optional: alert('🚨 SOS TRIGGERED!'))
+        }
+      })
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'sos_alerts' }, payload => {
+        if (payload.new.status === 'resolved' && activeSOS?.id === payload.new.id) {
+          setActiveSOS(null);
+        }
+      })
+      .subscribe();
+
+    return () => { supabase.removeChannel(channel); };
+  }, [activeSOS?.id]);
+
+  const handleResolveSOS = async () => {
+    if (!activeSOS) return;
+    try {
+      await supabase.from('sos_alerts').update({ status: 'resolved' }).eq('id', activeSOS.id);
+      setActiveSOS(null);
+    } catch (err) { console.error("Resolve Error:", err); }
+  };
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
@@ -33,6 +67,20 @@ export default function AdminLayout({ children }) {
 
   return (
     <div className="admin-layout">
+      {/* GLOBAL SOS ALARM BANNER */}
+      {activeSOS && (
+        <div className="sos-alarm-banner">
+          <div className="sos-msg">
+            <ShieldAlert size={32} />
+            🚨 CRITICAL INCIDENT: SOS BEACON ACTIVATED AT 
+            <span className="sos-location-name">{activeSOS.location_name || 'UNKNOWN LOCATION'}</span>
+          </div>
+          <button className="btn-dispatch" onClick={handleResolveSOS}>
+            Dispatch Police & Acknowledge
+          </button>
+        </div>
+      )}
+
       {/* SIDEBAR */}
       <aside className={`admin-sidebar${collapsed ? ' collapsed' : ''}`}>
         <div className="sidebar-brand" onClick={() => setCollapsed(p => !p)}>
