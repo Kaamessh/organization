@@ -6,43 +6,42 @@ import {
   MousePointer2, Info, BarChart3
 } from 'lucide-react';
 
+const LOCATIONS = [
+  "Baga Beach", "Calangute Beach", "Anjuna Beach", "Colva Beach", "Palolem Beach", 
+  "Vagator Beach", "Miramar Beach", "Dona Paula", "Aguada Fort", "Basilica of Bom Jesus", 
+  "Se Cathedral", "Mangueshi Temple", "Dudhsagar Falls", "Bondla Sanctuary", "Salim Ali Bird Sanctuary", 
+  "Divar Island", "Chorao Island", "Fontainhas", "Old Goa", "Panjim Market", 
+  "Mapusa Market", "Chapora Fort", "Cabo de Rama", "Butterfly Beach", "Cola Beach", 
+  "Galgibaga Beach", "Morjim Beach", "Ashwem Beach", "Arambol Beach"
+];
+
 const MOCK_ANALYTICS = {
   kpis: [
-    { label: "Total Footfall (YTD)", value: "1.2M", trend: "+8%", up: true, icon: <Users size={24} color="#0EA5E9" /> },
-    { label: "Most Stressed Hotspot", value: "Baga Beach", trend: "92% Cap", up: false, icon: <AlertCircle size={24} color="#E11D48" /> },
-    { label: "Highest Growth Gem", value: "Divar Island", trend: "+45% MoM", up: true, icon: <TrendingUp size={24} color="#10B981" /> },
-    { label: "AI Model Accuracy", value: "96.4%", trend: "±42 MAE", up: true, icon: <Target size={24} color="#F59E0B" /> },
+    { label: "Total Footfall (YTD)", value: "1.24M", trend: "+12.4%", up: true, icon: <Users size={24} color="#38bdf8" /> },
+    { label: "System Stress Index", value: "High", trend: "7 Hotspots Critical", up: false, icon: <AlertCircle size={24} color="#fb7185" /> },
+    { label: "AI Forecast Accuracy", value: "97.2%", trend: "±31 visitors", up: true, icon: <Target size={24} color="#fbbf24" /> },
+    { label: "Active Diversions", value: "14", trend: "+2 since 08:00", up: true, icon: <TrendingUp size={24} color="#34d399" /> },
   ],
-  trend: [
-    { month: 'Jan', hist: 120, forecast: null },
-    { month: 'Feb', hist: 110, forecast: null },
-    { month: 'Mar', hist: 95, forecast: null },
-    { month: 'Apr', hist: 80, forecast: null },
-    { month: 'May', hist: 85, forecast: null },
-    { month: 'Jun', hist: 60, forecast: null },
-    { month: 'Jul', hist: 55, forecast: null },
-    { month: 'Aug', hist: 65, forecast: null },
-    { month: 'Sep', hist: 75, forecast: null },
-    { month: 'Oct', hist: 90, forecast: null },
-    { month: 'Nov', hist: null, forecast: 115 },
-    { month: 'Dec', hist: null, forecast: 160 },
-  ],
-  distribution: [
-    { name: 'Calangute', val: 98, type: 'stress' },
-    { name: 'Baga', val: 92, type: 'stress' },
-    { name: 'Anjuna', val: 85, type: 'stress' },
-    { name: 'Dudhsagar', val: 78, type: 'stress' },
-    { name: 'Basilica', val: 72, type: 'stress' },
-    { name: 'Butterfly', val: 12, type: 'gem' },
-    { name: 'Divar Is.', val: 15, type: 'gem' },
-    { name: 'Chorla', val: 18, type: 'gem' },
-    { name: 'Cola', val: 22, type: 'gem' },
-    { name: 'Fontainhas', val: 28, type: 'gem' },
-  ],
-  factors: [
-    { label: 'Weekends', val: 40 },
-    { label: 'Holidays', val: 35 },
-    { label: 'Weather', val: 25 },
+  trend: Array.from({ length: 12 }, (_, i) => ({
+    month: ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][i],
+    hist: i < 10 ? 80 + Math.random() * 40 : null,
+    forecast: i >= 9 ? 100 + Math.random() * 60 : null
+  })),
+  hotspots: LOCATIONS.map((name, i) => ({
+    name,
+    load: Math.floor(20 + Math.random() * 75),
+    id: i + 1,
+    status: Math.random() > 0.8 ? 'critical' : (Math.random() > 0.6 ? 'warning' : 'optimal')
+  })),
+  hourly: Array.from({ length: 24 }, (_, i) => ({
+    hour: `${i}:00`,
+    val: 20 + Math.random() * 60 + (i > 10 && i < 20 ? 20 : 0)
+  })),
+  insights: [
+    "AI Prediction: Calangute Beach likely to exceed 95% capacity by 15:30 IST.",
+    "Weather Impact: Oncoming rain in North Goa diverting 15% traffic to Se Cathedral.",
+    "Trend Alert: Divar Island seeing unprecedented 45% MoM explorer growth.",
+    "System Alert: Chapora Fort parking at 100% capacity. Deployment of nudges recommended."
   ]
 };
 
@@ -80,12 +79,22 @@ export default function GlobalAnalytics() {
         </header>
 
         <main className="ent-main">
+          {/* AI INSIGHT TICKER */}
+          <section className="insight-ticker-container">
+            <div className="ticker-label">LIVE AI INSIGHTS</div>
+            <div className="ticker-track">
+              {MOCK_ANALYTICS.insights.concat(MOCK_ANALYTICS.insights).map((insight, i) => (
+                <span key={i} className="ticker-item"><AlertCircle size={14} /> {insight}</span>
+              ))}
+            </div>
+          </section>
+
           {/* Top KPI Cards */}
           <section className="analytics-grid">
             {MOCK_ANALYTICS.kpis.map((kpi, i) => (
-              <div key={i} className="analytics-card">
+              <div key={i} className="analytics-card glass-morph">
                 <div className="card-icon-bg">{kpi.icon}</div>
-                <span className="label">{kpi.label}</span>
+                <span className="label text-glow">{kpi.label}</span>
                 <div className="value">{kpi.value}</div>
                 <div className={`trend ${kpi.up ? 'up' : 'down'}`}>
                   {kpi.up ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
@@ -95,165 +104,95 @@ export default function GlobalAnalytics() {
             ))}
           </section>
 
-          {/* Main Forecasting Wave */}
-          <section className="analytics-main-chart">
-            <div className="chart-header-bi" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-               <div>
-                  <h2>12-Month Macro Footfall Trend</h2>
-                  <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginTop: '0.4rem' }}>Historical Load (Jan-Oct) vs Prophet Forecast (Nov-Dec)</p>
-               </div>
-               <div style={{ display: 'flex', gap: '1.5rem', fontSize: '0.75rem', fontWeight: 600 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    <div style={{ width: 20, height: 3, background: '#0EA5E9' }}></div> Historical
-                  </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    <div style={{ width: 20, height: 3, borderTop: '3px dotted #10B981' }}></div> AI Forecast
-                  </div>
-               </div>
-            </div>
-
-            <div className="chart-svg-container">
-               {/* Peak Season Highlight */}
-               <div style={{ 
-                 position: 'absolute', 
-                 right: 0, 
-                 width: '18%', 
-                 height: '100%', 
-                 background: 'rgba(225,29,72,0.05)', 
-                 borderLeft: '1px dashed rgba(225,29,72,0.2)',
-                 display: 'flex',
-                 alignItems: 'flex-end',
-                 justifyContent: 'center',
-                 paddingBottom: '1rem'
-               }}>
-                 <span style={{ color: 'var(--accent-red)', fontSize: '0.65rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '1px' }}>Peak Season Window</span>
-               </div>
-
-               <svg viewBox="0 0 100 100" preserveAspectRatio="none" style={{ width: '100%', height: '100%', overflow: 'visible' }}>
-                 {/* Grid Lines */}
-                 {[0, 25, 50, 75, 100].map(v => (
-                   <line key={v} x1="0" y1={v} x2="100" y2={v} stroke="rgba(255,255,255,0.05)" strokeWidth="0.5" />
-                 ))}
-                 
-                 {/* Main Path: Historical */}
-                 <path d={`M ${histPath}`} fill="none" stroke="#0EA5E9" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-                 
-                 {/* Main Path: Forecast */}
-                 <path d={`M ${forecastPath}`} fill="none" stroke="#10B981" strokeWidth="2.5" strokeDasharray="3,2" strokeLinecap="round" />
-
-                 {/* Data Points */}
-                 {points.map((p, i) => (
-                   <g key={i} onMouseEnter={() => setHoveredIdx(i)} onMouseLeave={() => setHoveredIdx(null)}>
-                     <circle 
-                        cx={p.x} cy={p.y} r={hoveredIdx === i ? 2.5 : 1} 
-                        fill={p.isForecast ? "#10B981" : "#0EA5E9"} 
-                        style={{ cursor: 'pointer', transition: 'r 0.2s' }} 
-                     />
-                     {hoveredIdx === i && (
-                        <foreignObject x={p.x < 80 ? p.x + 2 : p.x - 22} y={p.y - 12} width="20" height="10" style={{ overflow: 'visible' }}>
-                           <div className="chart-tooltip-bi">
-                              {MOCK_ANALYTICS.trend[i].month}: {MOCK_ANALYTICS.trend[i].hist || MOCK_ANALYTICS.trend[i].forecast}k
-                           </div>
-                        </foreignObject>
-                     )}
-                   </g>
-                 ))}
-               </svg>
-            </div>
-            
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '1.5rem', padding: '0 0.5rem' }}>
-               {MOCK_ANALYTICS.trend.map((d, i) => (
-                 <span key={i} style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: 600 }}>{d.month}</span>
-               ))}
-            </div>
-          </section>
-
-          {/* Bottom Split Grid */}
-          <section className="analytics-bottom-grid">
-            {/* Load Distribution Bar Chart */}
-            <div className="mini-chart-card">
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-                <h3>Load Distribution - Top 5 vs Bottom 5</h3>
-                <span style={{ fontSize: '0.65rem', color: 'var(--accent-brand)' }}>% CAPACITY LOAD</span>
+          <div className="dashboard-mid-split">
+            {/* Main Forecasting Wave */}
+            <section className="analytics-main-chart glass-morph">
+              <div className="chart-header-bi">
+                <div>
+                  <h2 className="section-title">Macro Footfall Wave (12 Months)</h2>
+                  <p className="section-subtitle">Real-time load projection using advanced Prophet modeling</p>
+                </div>
+                <div className="chart-legend">
+                  <div className="legend-item"><span className="dot hist" /> Historical</div>
+                  <div className="legend-item"><span className="dot fore" /> Forecast</div>
+                </div>
               </div>
-              <div className="bar-chart-v-wrapper">
-                {MOCK_ANALYTICS.distribution.map((item, i) => (
-                  <div key={i} className="bar-row-bi">
-                    <span className="bar-label-bi">{item.name}</span>
-                    <div className="bar-trail-bi">
-                       <div 
-                         className="bar-fill-bi" 
-                         style={{ 
-                           width: `${item.val}%`, 
-                           backgroundColor: item.type === 'stress' ? 'var(--accent-red)' : 'var(--accent-brand)',
-                           opacity: 0.7 + (item.val/100)*0.3
-                         }} 
-                       />
+
+              <div className="chart-svg-container-high">
+                <svg viewBox="0 0 100 40" preserveAspectRatio="none" style={{ width: '100%', height: '100%', overflow: 'visible' }}>
+                  <path d={`M ${points.filter(p => !p.isForecast || p.x === points[9].x).map(p => `${p.x},${p.y * 0.4}`).join(' L ')}`} fill="none" stroke="#38bdf8" strokeWidth="1.5" strokeLinecap="round" />
+                  <path d={`M ${points.filter((p, i) => i >= 9).map(p => `${p.x},${p.y * 0.4}`).join(' L ')}`} fill="none" stroke="#34d399" strokeWidth="1.5" strokeDasharray="2,1" />
+                </svg>
+              </div>
+
+              <div className="chart-labels-row">
+                {MOCK_ANALYTICS.trend.map((d, i) => (
+                  <span key={i}>{d.month}</span>
+                ))}
+              </div>
+            </section>
+
+            {/* Weather Impact Intelligence */}
+            <section className="weather-intelligence-card glass-morph">
+              <h3 className="section-title">Environmental Context</h3>
+              <div className="weather-grid">
+                <div className="weather-stat large">
+                  <div className="w-val">31°C</div>
+                  <div className="w-label">CURRENT TEMP</div>
+                </div>
+                <div className="weather-stat">
+                  <div className="w-val">65%</div>
+                  <div className="w-label">HUMIDITY</div>
+                </div>
+                <div className="weather-stat">
+                  <div className="w-val">0.0<small>mm</small></div>
+                  <div className="w-label">PRECIPITATION</div>
+                </div>
+              </div>
+              <div className="weather-analysis">
+                <Info size={16} />
+                <span>Weather conditions are currently <strong>Optimal</strong> for beach tourism. Expected 12% rise in Dudhsagar Falls interest if precipitation increases.</span>
+              </div>
+            </section>
+          </div>
+
+          <div className="dashboard-bottom-split">
+            {/* Real-time 29 Hotspot Grid */}
+            <section className="hotspot-monitor-section glass-morph">
+              <div className="monitor-header">
+                <h3 className="section-title">29-Hotspot Capacity Monitor</h3>
+                <div className="monitor-stats">
+                  <span>OVERALL LOAD: <strong style={{ color: '#fbbf24' }}>74%</strong></span>
+                </div>
+              </div>
+              <div className="hotspot-scroll-grid">
+                {MOCK_ANALYTICS.hotspots.map((h, i) => (
+                  <div key={i} className={`hotspot-mini-card ${h.status}`}>
+                    <div className="h-info">
+                      <span className="h-name">{h.name}</span>
+                      <span className="h-val">{h.load}%</span>
                     </div>
-                    <span className="bar-value-bi">{item.val}%</span>
+                    <div className="h-bar-bg">
+                      <div className="h-bar-fill" style={{ width: `${h.load}%` }} />
+                    </div>
                   </div>
                 ))}
               </div>
-            </div>
+            </section>
 
-            {/* AI Factors Radar */}
-            <div className="mini-chart-card">
-              <h3>Contextual Factors Engine (XGBoost Inputs)</h3>
-              <div className="radar-svg-wrapper">
-                 <svg viewBox="-50 -50 100 100" style={{ width: '100%', height: '100%' }}>
-                   {/* Background circles */}
-                   {[20, 40, 60, 80, 100].map(r => (
-                     <circle key={r} cx="0" cy="0" r={r/2} fill="none" stroke="rgba(255,255,255,0.05)" strokeWidth="0.5" />
-                   ))}
-                   
-                   {/* Factor Data Polygon */}
-                   <polygon 
-                     points={MOCK_ANALYTICS.factors.map((f, i) => {
-                       const deg = i * (360 / MOCK_ANALYTICS.factors.length) - 90;
-                       const r = f.val;
-                       return `${r/2 * Math.cos(deg * Math.PI / 180)},${r/2 * Math.sin(deg * Math.PI / 180)}`;
-                     }).join(' ')} 
-                     fill="rgba(14,165,233,0.2)" 
-                     stroke="var(--accent-brand)" 
-                     strokeWidth="2" 
-                   />
-                   
-                   {/* Labels */}
-                   {MOCK_ANALYTICS.factors.map((f, i) => {
-                     const deg = i * (360 / MOCK_ANALYTICS.factors.length) - 90;
-                     const r = 55;
-                     return (
-                        <text 
-                          key={i} 
-                          x={r/2 * Math.cos(deg * Math.PI / 180)} 
-                          y={r/2 * Math.sin(deg * Math.PI / 180)} 
-                          fill="var(--text-muted)" 
-                          fontSize="6" 
-                          textAnchor="middle"
-                          alignmentBaseline="middle"
-                        >
-                          {f.label}
-                        </text>
-                     );
-                   })}
-                 </svg>
+            {/* Hourly Congestion Heatmap */}
+            <section className="hourly-heatmap-card glass-morph">
+              <h3 className="section-title">24-Hour State-wide Congestion</h3>
+              <div className="hourly-bars">
+                {MOCK_ANALYTICS.hourly.map((h, i) => (
+                  <div key={i} className="h-bar-v-container">
+                    <div className="h-bar-v-fill" style={{ height: `${h.val}%`, opacity: h.val > 70 ? 1 : 0.6 }} />
+                    <span className="h-bar-time">{h.hour}</span>
+                  </div>
+                ))}
               </div>
-              <div className="radar-labels">
-                 {MOCK_ANALYTICS.factors.map((f, i) => (
-                   <div key={i} className="radar-tag">
-                      <div className="dot" style={{ backgroundColor: i === 0 ? '#0EA5E9' : i === 1 ? '#E11D48' : '#10B981' }} />
-                      {f.label}: {f.val}%
-                   </div>
-                 ))}
-              </div>
-              <div style={{ marginTop: '1.5rem', background: 'rgba(15,23,42,0.4)', padding: '1rem', borderRadius: '12px', border: '1px solid var(--ent-border)' }}>
-                 <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', lineHeight: '1.4' }}>
-                   <Info size={14} style={{ verticalAlign: 'middle', marginRight: '6px' }} />
-                   The XGBoost model weight is currently biased towards <strong>Weekend Volume</strong>. This correlates with the 45% MoM growth seen at Hidden Gems like Divar Island.
-                 </p>
-              </div>
-            </div>
-          </section>
+            </section>
+          </div>
         </main>
       </div>
     </AdminLayout>
