@@ -236,7 +236,7 @@ export default function OfficerDashboard() {
           </select>
           <div className="capacity-badge">
              <span className="label">MAX CAP:</span>
-             <span className="value">{activeCapacity.toLocaleString()}</span>
+             <span className="value">{(activeCapacity || 0).toLocaleString()}</span>
           </div>
           <button
             className="ent-btn-primary"
@@ -264,8 +264,8 @@ export default function OfficerDashboard() {
                 >
                   <Calendar size={18} color={dayDanger ? "var(--accent-red)" : "var(--text-muted)"} />
                   <div className="day-info">
-                    <strong>{idx === 0 ? 'Today' : dateStr}</strong>
-                    <span className={dayDanger ? 'text-red' : 'text-blue'}>Peak: {dayPeak.toLocaleString()}</span>
+                    <strong>{idx === 0 ? 'Today' : (dateStr || 'Unknown')}</strong>
+                    <span className={dayDanger ? 'text-red' : 'text-blue'}>Peak: {(dayPeak || 0).toLocaleString()}</span>
                   </div>
                 </div>
               );
@@ -292,7 +292,7 @@ export default function OfficerDashboard() {
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '0.8rem', paddingLeft: '0.5rem' }}>
               <div style={{ flex: 1, borderTop: '2px dashed #E11D48', opacity: 0.7 }} />
               <span style={{ color: '#E11D48', fontSize: '0.78rem', fontWeight: 800, letterSpacing: '1px', whiteSpace: 'nowrap', background: 'var(--ent-panel)', padding: '0.2rem 0.6rem', borderRadius: '4px', border: '1px solid rgba(225,29,72,0.3)' }}>
-                ⚠ 80% THRESHOLD — {(activeCapacity * 0.8).toLocaleString()} visitors
+                ⚠ 80% THRESHOLD — {((activeCapacity || 5000) * 0.8).toLocaleString()} visitors
               </span>
               <div style={{ flex: 1, borderTop: '2px dashed #E11D48', opacity: 0.7 }} />
             </div>
@@ -303,8 +303,8 @@ export default function OfficerDashboard() {
                   const isDanger = val >= (activeCapacity * 0.8);
                   return (
                     <div key={hr} className="bar-column">
-                      <div className="bar-tooltip">{val.toLocaleString()} tourists</div>
-                      <div className={`bar ${isDanger ? 'bar-danger' : 'bar-safe'}`} style={{ height: `${Math.min(percent, 100)}%` }}></div>
+                      <div className="bar-tooltip">{(val || 0).toLocaleString()} tourists</div>
+                      <div className={`bar ${isDanger ? 'bar-danger' : 'bar-safe'}`} style={{ height: `${Math.min(percent || 0, 100)}%` }}></div>
                       <span className="x-label">{hr}:00</span>
                     </div>
                   );
@@ -319,7 +319,7 @@ export default function OfficerDashboard() {
                  <AlertTriangle size={36} />
                  <div>
                    <h3>CRITICAL CAPACITY EXCEEDED</h3>
-                   <p>Peak traffic reaches <b>{current24h[peakHourIndex].toLocaleString()}</b> at <b>{peakHourIndex}:00</b>. AI recommends immediate traffic rerouting to preserve local infrastructure.</p>
+                   <p>Peak traffic reaches <b>{(current24h[peakHourIndex] || 0).toLocaleString()}</b> at <b>{peakHourIndex}:00</b>. AI recommends immediate traffic rerouting to preserve local infrastructure.</p>
                  </div>
                </div>
              ) : (
@@ -389,7 +389,7 @@ export default function OfficerDashboard() {
                       </div>
                       <div className="card-body">
                          <div className="cap-val">
-                           <span className="val">{cap.toLocaleString()}</span>
+                           <span className="val">{(cap || 0).toLocaleString()}</span>
                            <span className="unit">visitors max</span>
                          </div>
                          <div className="progress-bg">

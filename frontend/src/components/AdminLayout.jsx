@@ -166,7 +166,7 @@ export default function AdminLayout({ children }) {
             to="/profile"
             className={({ isActive }) => `sidebar-link${isActive ? ' active' : ''}`}
           >
-            <div className="sidebar-avatar">{username[0]?.toUpperCase()}</div>
+            <div className="sidebar-avatar">{username ? username[0]?.toUpperCase() : 'O'}</div>
             {!collapsed && (
               <div className="sidebar-user">
                 <span className="sidebar-username">{username}</span>
