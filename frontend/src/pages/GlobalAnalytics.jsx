@@ -27,15 +27,22 @@ const MOCK_ANALYTICS = {
     hist: i < 10 ? 80 + Math.random() * 40 : null,
     forecast: i >= 9 ? 100 + Math.random() * 60 : null
   })),
-  hotspots: LOCATIONS.map((name, i) => ({
-    name,
-    load: Math.floor(20 + Math.random() * 75),
-    id: i + 1,
-    status: Math.random() > 0.8 ? 'critical' : (Math.random() > 0.6 ? 'warning' : 'optimal')
-  })),
+  hotspots: LOCATIONS.map((name, i) => {
+    const capacity = 2000 + Math.floor(Math.random() * 8000);
+    const load = Math.floor(20 + Math.random() * 75);
+    return {
+      name,
+      load,
+      visitors: Math.floor((load / 100) * capacity),
+      capacity,
+      id: i + 1,
+      status: load > 85 ? 'critical' : (load > 60 ? 'warning' : 'optimal')
+    };
+  }),
   hourly: Array.from({ length: 24 }, (_, i) => ({
     hour: `${i}:00`,
-    val: 20 + Math.random() * 60 + (i > 10 && i < 20 ? 20 : 0)
+    val: 20 + Math.random() * 60 + (i > 10 && i < 20 ? 20 : 0),
+    count: 500 + Math.floor(Math.random() * 2000)
   })),
   insights: [
     "AI Prediction: Calangute Beach likely to exceed 95% capacity by 15:30 IST.",
@@ -169,7 +176,10 @@ export default function GlobalAnalytics() {
                 {MOCK_ANALYTICS.hotspots.map((h, i) => (
                   <div key={i} className={`hotspot-mini-card ${h.status}`}>
                     <div className="h-info">
-                      <span className="h-name">{h.name}</span>
+                      <div style={{ display: 'flex', flexDirection: 'column' }}>
+                        <span className="h-name">{h.name}</span>
+                        <span style={{ fontSize: '0.6rem', color: 'var(--text-muted)' }}>{h.visitors.toLocaleString()} / {h.capacity.toLocaleString()} PAX</span>
+                      </div>
                       <span className="h-val">{h.load}%</span>
                     </div>
                     <div className="h-bar-bg">
@@ -186,6 +196,7 @@ export default function GlobalAnalytics() {
               <div className="hourly-bars">
                 {MOCK_ANALYTICS.hourly.map((h, i) => (
                   <div key={i} className="h-bar-v-container">
+                    <span style={{ fontSize: '0.5rem', color: '#38bdf8', marginBottom: '2px', fontWeight: 'bold' }}>{h.count}</span>
                     <div className="h-bar-v-fill" style={{ height: `${h.val}%`, opacity: h.val > 70 ? 1 : 0.6 }} />
                     <span className="h-bar-time">{h.hour}</span>
                   </div>
